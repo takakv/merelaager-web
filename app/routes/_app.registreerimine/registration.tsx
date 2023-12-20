@@ -1,10 +1,5 @@
 import { Form } from "@remix-run/react";
-import type {
-  ForwardedRef,
-  ForwardRefExoticComponent,
-  MutableRefObject,
-  RefAttributes,
-} from "react";
+import type { ForwardedRef, ForwardRefExoticComponent, MutableRefObject, RefAttributes } from "react";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 
 import { InfoBanner, WarningBanner } from "~/components/banners";
@@ -28,7 +23,7 @@ import {
   ShiftInput,
   ShirtInput,
   TermsAcknowledgeInput,
-  UseIDCodeInput,
+  UseIDCodeInput
 } from "~/routes/_app.registreerimine/inputs";
 
 interface ChildFormEntryProps {
@@ -41,10 +36,10 @@ interface FormChildBasicRowProps extends ChildFormEntryProps {
 }
 
 const FormChildBasicRow = ({
-  entryId,
-  required,
-  useIDCode,
-}: FormChildBasicRowProps) => {
+                             entryId,
+                             required,
+                             useIDCode
+                           }: FormChildBasicRowProps) => {
   return (
     <div className="registration-form__row has-after">
       <NameInput entryId={entryId} isRequired={required} />
@@ -92,7 +87,8 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
 
 interface FormShiftPickerRowProps
   extends ChildFormEntryProps,
-    IUpdateSeniority {}
+    IUpdateSeniority {
+}
 
 const FormShiftPickerRow: ForwardRefExoticComponent<
   FormShiftPickerRowProps & RefAttributes<any>
@@ -142,10 +138,10 @@ interface RemoveChildButtonProps {
 }
 
 const RemoveChildButton = ({
-  entryId,
-  childCount,
-  removeChildCard,
-}: RemoveChildButtonProps): null | JSX.Element => {
+                             entryId,
+                             childCount,
+                             removeChildCard
+                           }: RemoveChildButtonProps): null | JSX.Element => {
   if (entryId !== childCount - 1 || childCount === 1) return null;
   return (
     <div className="registration-form__close" onClick={removeChildCard}></div>
@@ -231,9 +227,9 @@ interface AddChildButtonProps {
 }
 
 const AddChildButton = ({
-  isActive,
-  addChildCard,
-}: AddChildButtonProps): null | JSX.Element => {
+                          isActive,
+                          addChildCard
+                        }: AddChildButtonProps): null | JSX.Element => {
   if (!isActive) return null;
   return (
     <div className="registration-form__unit registration-form__unit--mt0">
@@ -386,6 +382,9 @@ export const RegistrationSection = () => {
     <section className="c-section">
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
+        <WarningBanner>
+          <p>Registreerimine algab 01.01.2024 kell 14:00 Eesti aja järgi.</p>
+        </WarningBanner>
         <WarningBanner>
           <b>NB!</b> Registreerimiskinnitus ei ole enam
           automaatne. Registreerimiskinnituse saate meilile siis, kui juhataja
