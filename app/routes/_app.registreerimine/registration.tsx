@@ -248,7 +248,7 @@ const AddChildButton = ({
 };
 
 const RegistrationSubmitButton = () => {
-  const isDisabled: boolean = false;
+  const isDisabled: boolean = true;
 
   return (
     <button
@@ -387,7 +387,7 @@ export const RegistrationSection = () => {
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
         <WarningBanner>
-          <b>NB!</b> Sellest aastast ei ole registreerimiskinnitus enam
+          <b>NB!</b> Registreerimiskinnitus ei ole enam
           automaatne. Registreerimiskinnituse saate meilile siis, kui juhataja
           on koha kinnitanud. Kohtade kinnitamine toimub endiselt ajalise
           järjekorra põhiselt.
