@@ -38,10 +38,10 @@ const promoContent: PromoContent[] = [
     description:
       "Suurepärane võimalus 8–16aastastel merehuvilistel veeta suvi looduskaunis kohas mere kaldal.",
     img: (
-      <img
-        alt="Pilt laagriplatsist ilusa ilmaga."
-        src="/img/landing/laager.webp"
-      />
+      <video autoPlay loop muted>
+        <source src="/img/landing/introduction.webm" type="video/webm" />
+        Your browser does not support the video tag.
+      </video>
     )
   },
   {
@@ -49,10 +49,10 @@ const promoContent: PromoContent[] = [
     description:
       "12päevase laagrivahetuse jooksul võib selgeks saada nii purjetamise, sõudmise kui ka muude meresõiduvahendite kasutamise algtõed.",
     img: (
-      <img
-        alt="Kolm Quba-klass purjekat koos lastega."
-        src="/img/landing/quba.webp"
-      />
+      <video autoPlay loop muted>
+        <source src="/img/landing/sailing.webm" type="video/webm" />
+        Your browser does not support the video tag.
+      </video>
     )
   },
   {
