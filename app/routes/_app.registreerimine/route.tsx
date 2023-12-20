@@ -147,7 +147,6 @@ export default function RegistrationRoute() {
   return (
     <main>
       <RefsSection />
-      <FreeSpaceSection />
       <RegistrationSection />
     </main>
   );
