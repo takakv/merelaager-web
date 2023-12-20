@@ -1,0 +1,70 @@
+{
+  "name": "merelaager-web",
+  "private": true,
+  "sideEffects": false,
+  "packageManager": "yarn@4.0.2",
+  "scripts": {
+    "build": "run-s build:*",
+    "build:remix": "remix build",
+    "build:server": "esbuild --platform=node --format=cjs ./server.ts --outdir=build --bundle --external:fsevents",
+    "dev": "run-p dev:*",
+    "dev:server": "cross-env NODE_ENV=development npm run build:server -- --watch",
+    "dev:remix": "remix dev --manual -c \"node --watch-path ./build/server.js --watch ./build/server.js\"",
+    "start": "cross-env NODE_ENV=production node ./build/server.js",
+    "typecheck": "tsc",
+    "sass": "sass --style=compressed ./styles/global.scss ./app/styles/global.css"
+  },
+  "prettier": {},
+  "eslintIgnore": [
+    "/node_modules",
+    "/build",
+    "/public/build"
+  ],
+  "dependencies": {
+    "@prisma/client": "^5.7.1",
+    "@remix-run/express": "^2.4.0",
+    "@remix-run/node": "^2.4.0",
+    "@remix-run/react": "^2.4.0",
+    "@remix-run/serve": "^2.4.0",
+    "chokidar": "^3.5.3",
+    "connect-slashes": "^1.4.0",
+    "cross-env": "^7.0.3",
+    "express": "^4.18.2",
+    "http-status-codes": "^2.3.0",
+    "isbot": "^3.7.1",
+    "morgan": "^1.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^2.4.0",
+    "@remix-run/eslint-config": "^2.4.0",
+    "@types/compression": "^1.7.5",
+    "@types/connect-slashes": "^0.0.36",
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@types/source-map-support": "^0.5.10",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "esbuild": "^0.19.10",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.1.1",
+    "prisma": "^5.7.1",
+    "sass": "^1.69.5",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

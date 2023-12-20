@@ -1,0 +1,30 @@
+# Secrets
+.env
+
+# Large files
+public/*
+!public/.gitkeep
+
+# Styles should be re-generated with SASS
+*.css
+*.css.map
+
+# Build
+/.cache
+/build
+/public/build
+
+# DEVenv
+.idea/
+.DS_Store
+
+# Yarn stuff
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+node_modules/*
