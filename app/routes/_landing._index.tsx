@@ -39,7 +39,10 @@ const promoContent: PromoContent[] = [
       "Suurepärane võimalus 8–16aastastel merehuvilistel veeta suvi looduskaunis kohas mere kaldal.",
     img: (
       <video autoPlay loop muted>
-        <source src="/img/landing/introduction.webm" type="video/webm" />
+        <source 
+        title="Laagri ülevaatlikud klipid"
+        src="/img/landing/introduction.webm" 
+        type="video/webm" />
         Your browser does not support the video tag.
       </video>
     )
@@ -50,7 +53,11 @@ const promoContent: PromoContent[] = [
       "12päevase laagrivahetuse jooksul võib selgeks saada nii purjetamise, sõudmise kui ka muude meresõiduvahendite kasutamise algtõed.",
     img: (
       <video autoPlay loop muted>
-        <source src="/img/landing/sailing.webm" type="video/webm" />
+        <source 
+        title="Purjetamine, sõudmine ja süstad"
+        src="/img/landing/sailing.webm" 
+        type="video/webm" 
+        />
         Your browser does not support the video tag.
       </video>
     )
@@ -60,10 +67,14 @@ const promoContent: PromoContent[] = [
     description:
       "Merelaagri õhtuid ja ka tormipäevi sisustavad tavapärased laagri tegevused – lõkkeõhtud, diskod, matkad ja mitmesugused võistlused.",
     img: (
-      <img
-        alt="Lapsed istuvad laua ümber koos legodega."
-        src="/img/landing/legod.webp"
-      />
+      <video autoPlay loop muted>
+        <source 
+        title="Vaba aja veetmise viisid"
+        src="/img/landing/freetime.webm" 
+        type="video/webm" 
+        />
+        Your browser does not support the video tag.
+      </video>
     )
   }
 ];
