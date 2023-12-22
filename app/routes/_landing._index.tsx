@@ -1,8 +1,8 @@
 import type { LinksFunction, MetaDescriptor, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import type { ReactElement } from "react";
-import { Fragment } from "react";
+import type { ReactElement, SyntheticEvent } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 
 import Sponsors from "~/components/sponsors";
 import NavBar from "~/components/nav-bar";
@@ -29,7 +29,8 @@ export const links: LinksFunction = () => [
 interface PromoContent {
   title: string;
   description: string;
-  img: ReactElement;
+  img?: ReactElement;
+  video?: string;
 }
 
 const promoContent: PromoContent[] = [
@@ -37,45 +38,19 @@ const promoContent: PromoContent[] = [
     title: "Laoküla merelaager",
     description:
       "Suurepärane võimalus 8–16aastastel merehuvilistel veeta suvi looduskaunis kohas mere kaldal.",
-    img: (
-      <video autoPlay loop muted>
-        <source 
-        title="Laagri ülevaatlikud klipid"
-        src="/img/landing/introduction.webm" 
-        type="video/webm" />
-        Your browser does not support the video tag.
-      </video>
-    )
+    video: "/img/landing/introduction.webm"
   },
   {
     title: "Eelnev merekogemus pole oluline",
     description:
       "12päevase laagrivahetuse jooksul võib selgeks saada nii purjetamise, sõudmise kui ka muude meresõiduvahendite kasutamise algtõed.",
-    img: (
-      <video autoPlay loop muted>
-        <source 
-        title="Purjetamine, sõudmine ja süstad"
-        src="/img/landing/sailing.webm" 
-        type="video/webm" 
-        />
-        Your browser does not support the video tag.
-      </video>
-    )
+    video: "/img/landing/sailing.webm"
   },
   {
     title: "Ja siis, kui merele ei saa",
     description:
       "Merelaagri õhtuid ja ka tormipäevi sisustavad tavapärased laagri tegevused – lõkkeõhtud, diskod, matkad ja mitmesugused võistlused.",
-    img: (
-      <video autoPlay loop muted>
-        <source 
-        title="Vaba aja veetmise viisid"
-        src="/img/landing/freetime.webm" 
-        type="video/webm" 
-        />
-        Your browser does not support the video tag.
-      </video>
-    )
+    video: "/img/landing/freetime.webm"
   }
 ];
 
@@ -107,12 +82,36 @@ const CTASection = () => {
 };
 
 const PromoSectionCards = () => {
+  const [videoProgress, setVideoProgress] = useState(Array(promoContent.length).fill(0));
+
+  const setProgress = (idx: number, e) => {
+    if (isNaN(e.target.duration))
+      return;
+    if (e.target) {
+      const progress = (e.target.currentTime / e.target.duration) * 100;
+      setVideoProgress(prevProgress => {
+        const newProgress = [...prevProgress];
+        newProgress[idx] = progress;
+        return newProgress;
+      });
+    }
+  };
+
   const promoSections = promoContent.map((content, idx) => {
     let classes = "c-home-block";
     if ((idx & 0x01) !== 1) classes += ` ${classes}--inverted`;
     return (
       <div key={idx} className={classes}>
-        <div className="c-home-block-media">{content.img}</div>
+        <div className="c-home-block-media">
+        <video
+          autoPlay
+          loop
+          muted
+          onTimeUpdate={(e) => setProgress(idx, e)}
+          src={content.video}
+        />
+        <progress className="progressbar" id={`progress_${idx}`} max="100" value={videoProgress[idx]}/>
+        </div>
         <div className="c-home-block-body">
           <h3>{content.title}</h3>
           <p>{content.description}</p>

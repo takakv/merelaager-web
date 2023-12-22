@@ -13,7 +13,7 @@
     "start": "cross-env NODE_ENV=production node ./build/server.js",
     "typecheck": "tsc",
     "sass": "sass --style=compressed ./styles/global.scss ./app/styles/global.css",
-    "reload": "yarn build:remix && yarn build:server && yarn sass && yarn start"
+    "reload": "yarn sass && yarn build:remix && yarn build:server && yarn start"
   },
   "prettier": {},
   "eslintIgnore": [
