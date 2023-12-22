@@ -1,8 +1,8 @@
 import type { LinksFunction, MetaDescriptor, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import type { ReactElement, SyntheticEvent } from "react";
-import React, { Fragment, useState, useEffect } from "react";
+import type { ReactElement } from "react";
+import React, { Fragment, useState, useRef, createRef } from "react";
 
 import Sponsors from "~/components/sponsors";
 import NavBar from "~/components/nav-bar";
@@ -83,6 +83,7 @@ const CTASection = () => {
 
 const PromoSectionCards = () => {
   const [videoProgress, setVideoProgress] = useState(Array(promoContent.length).fill(0));
+  const vidRef = useRef(promoContent.map(() => createRef()));
 
   const setProgress = (idx: number, e) => {
     if (isNaN(e.target.duration))
@@ -97,6 +98,12 @@ const PromoSectionCards = () => {
     }
   };
 
+  const playPauseVideo = (idx: number) => {
+    const video = vidRef.current[idx].current;
+    if (video.paused) video.play();
+    else video.pause();
+  };
+
   const promoSections = promoContent.map((content, idx) => {
     let classes = "c-home-block";
     if ((idx & 0x01) !== 1) classes += ` ${classes}--inverted`;
@@ -104,10 +111,12 @@ const PromoSectionCards = () => {
       <div key={idx} className={classes}>
         <div className="c-home-block-media">
         <video
+          ref={vidRef.current[idx]}
           autoPlay
           loop
           muted
           onTimeUpdate={(e) => setProgress(idx, e)}
+          onClick={() => playPauseVideo(idx)}
           src={content.video}
         />
         <progress className="progressbar" id={`progress_${idx}`} max="100" value={videoProgress[idx]}/>
