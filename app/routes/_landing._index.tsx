@@ -30,7 +30,8 @@ interface PromoContent {
   title: string;
   description: string;
   img?: ReactElement;
-  video?: string;
+  video_mp4?: string;
+  video_webm?: string;
 }
 
 const promoContent: PromoContent[] = [
@@ -38,19 +39,22 @@ const promoContent: PromoContent[] = [
     title: "Laoküla merelaager",
     description:
       "Suurepärane võimalus 8–16aastastel merehuvilistel veeta suvi looduskaunis kohas mere kaldal.",
-    video: "/img/landing/introduction.webm"
+    video_webm: "/img/landing/introduction.webm",
+    video_mp4: "/img/landing/introduction.mp4"
   },
   {
     title: "Eelnev merekogemus pole oluline",
     description:
       "12päevase laagrivahetuse jooksul võib selgeks saada nii purjetamise, sõudmise kui ka muude meresõiduvahendite kasutamise algtõed.",
-    video: "/img/landing/sailing.webm"
+    video_webm: "/img/landing/sailing.webm",
+    video_mp4: "/img/landing/sailing.mp4"
   },
   {
     title: "Ja siis, kui merele ei saa",
     description:
       "Merelaagri õhtuid ja ka tormipäevi sisustavad tavapärased laagri tegevused – lõkkeõhtud, diskod, matkad ja mitmesugused võistlused.",
-    video: "/img/landing/freetime.webm"
+    video_webm: "/img/landing/freetime.webm",
+    video_mp4: "/img/landing/freetime.mp4"
   }
 ];
 
@@ -116,10 +120,12 @@ const PromoSectionCards = () => {
           autoPlay
           loop
           muted
+          playsInline
           onTimeUpdate={(e) => setProgress(idx, e)}
-          onClick={() => playPauseVideo(idx)}
-          src={content.video}
-        />
+          onClick={() => playPauseVideo(idx)}>
+          <source src={content.video_mp4} type="video/mp4"></source>
+          <source src={content.video_webm} type="video/webm"></source>
+        </video>
         <progress className="progressbar" id={`progress_${idx}`} max="100" value={videoProgress[idx]}/>
         </div>
         <div className="c-home-block-body">
