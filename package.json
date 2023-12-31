@@ -12,7 +12,8 @@
     "dev:remix": "remix dev --manual -c \"node --watch-path ./build/server.js --watch ./build/server.js\"",
     "start": "cross-env NODE_ENV=production node ./build/server.js",
     "typecheck": "tsc",
-    "sass": "sass --style=compressed ./styles/global.scss ./app/styles/global.css"
+    "sass": "sass --style=compressed ./styles/global.scss ./app/styles/global.css",
+    "reload": "yarn sass && yarn build:remix && yarn build:server && yarn start"
   },
   "prettier": {},
   "eslintIgnore": [

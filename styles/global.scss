@@ -873,6 +873,30 @@ a {
     margin-bottom: 0;
   }
 
+  .progressbar {
+    width: 100%;
+    max-width: 25%;
+    display: block;
+    margin: 0 auto;
+    height: 2px;
+    position: relative;
+    bottom: 0px; // -45px to place on top of video
+    border-radius: 10em;
+    border: none;
+    opacity: 40%;
+  }
+  
+  progress::-webkit-progress-bar {
+    border-radius: 10em;
+    background: #e4e4e4;   
+ }
+
+ progress::-webkit-progress-value {
+    border-radius: 10em;
+    background: var(--primary);
+    transition: width 0.5s ease;
+ }
+
   @media screen and (min-width: $tablet-break) {
     flex-direction: row;
     justify-content: space-between;
@@ -1005,7 +1029,7 @@ a {
       bottom: -20px;
     }
     @media screen and (min-width: $laptop-break) {
-      bottom: -60px;
+      bottom: -20px;
     }
   }
 

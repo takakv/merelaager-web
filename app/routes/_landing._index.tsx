@@ -2,7 +2,7 @@ import type { LinksFunction, MetaDescriptor, MetaFunction } from "@remix-run/nod
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { ReactElement } from "react";
-import { Fragment } from "react";
+import React, { Fragment, useState, useRef, createRef, RefObject } from "react";
 
 import Sponsors from "~/components/sponsors";
 import NavBar from "~/components/nav-bar";
@@ -29,7 +29,9 @@ export const links: LinksFunction = () => [
 interface PromoContent {
   title: string;
   description: string;
-  img: ReactElement;
+  img?: ReactElement;
+  video_mp4?: string;
+  video_webm?: string;
 }
 
 const promoContent: PromoContent[] = [
@@ -37,34 +39,22 @@ const promoContent: PromoContent[] = [
     title: "Laoküla merelaager",
     description:
       "Suurepärane võimalus 8–16aastastel merehuvilistel veeta suvi looduskaunis kohas mere kaldal.",
-    img: (
-      <img
-        alt="Pilt laagriplatsist ilusa ilmaga."
-        src="/img/landing/laager.webp"
-      />
-    )
+    video_webm: "/img/landing/introduction.webm",
+    video_mp4: "/img/landing/introduction.mp4"
   },
   {
     title: "Eelnev merekogemus pole oluline",
     description:
       "12päevase laagrivahetuse jooksul võib selgeks saada nii purjetamise, sõudmise kui ka muude meresõiduvahendite kasutamise algtõed.",
-    img: (
-      <img
-        alt="Kolm Quba-klass purjekat koos lastega."
-        src="/img/landing/quba.webp"
-      />
-    )
+    video_webm: "/img/landing/sailing.webm",
+    video_mp4: "/img/landing/sailing.mp4"
   },
   {
     title: "Ja siis, kui merele ei saa",
     description:
       "Merelaagri õhtuid ja ka tormipäevi sisustavad tavapärased laagri tegevused – lõkkeõhtud, diskod, matkad ja mitmesugused võistlused.",
-    img: (
-      <img
-        alt="Lapsed istuvad laua ümber koos legodega."
-        src="/img/landing/legod.webp"
-      />
-    )
+    video_webm: "/img/landing/freetime.webm",
+    video_mp4: "/img/landing/freetime.mp4"
   }
 ];
 
@@ -96,12 +86,48 @@ const CTASection = () => {
 };
 
 const PromoSectionCards = () => {
+  const [videoProgress, setVideoProgress] = useState(Array(promoContent.length).fill(0));
+  const vidRef = useRef(promoContent.map(() => createRef()));
+
+  const setProgress = (idx: number, e: React.SyntheticEvent) => {
+    let video = e.target as HTMLVideoElement;
+    if (isNaN(video.duration))
+      return;
+    if (video) {
+      const progress = (video.currentTime / video.duration) * 100;
+      setVideoProgress(prevProgress => {
+        const newProgress = [...prevProgress];
+        newProgress[idx] = progress;
+        return newProgress;
+      });
+    }
+  };
+
+  const playPauseVideo = (idx: number) => {
+    const video = vidRef.current[idx].current as HTMLVideoElement;
+    if (video.paused) video.play();
+    else video.pause();
+  };
+
   const promoSections = promoContent.map((content, idx) => {
     let classes = "c-home-block";
     if ((idx & 0x01) !== 1) classes += ` ${classes}--inverted`;
     return (
       <div key={idx} className={classes}>
-        <div className="c-home-block-media">{content.img}</div>
+        <div className="c-home-block-media">
+        <video
+          ref={vidRef.current[idx] as RefObject<HTMLVideoElement>}
+          autoPlay
+          loop
+          muted
+          playsInline
+          onTimeUpdate={(e) => setProgress(idx, e)}
+          onClick={() => playPauseVideo(idx)}>
+          <source src={content.video_mp4} type="video/mp4"></source>
+          <source src={content.video_webm} type="video/webm"></source>
+        </video>
+        <progress className="progressbar" id={`progress_${idx}`} max="100" value={videoProgress[idx]}/>
+        </div>
         <div className="c-home-block-body">
           <h3>{content.title}</h3>
           <p>{content.description}</p>
