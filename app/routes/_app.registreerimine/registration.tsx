@@ -1,10 +1,19 @@
 import { Form } from "@remix-run/react";
-import type { ForwardedRef, ForwardRefExoticComponent, MutableRefObject, RefAttributes } from "react";
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  ForwardRefExoticComponent,
+  MutableRefObject,
+  RefAttributes,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from "react";
 
 import { InfoBanner, WarningBanner } from "~/components/banners";
 
-import type { IUpdateSeniority } from "~/routes/_app.registreerimine/inputs";
+import type { IUpdateSeniority, IUpdateShifts } from "~/routes/_app.registreerimine/inputs";
 import {
   AddendumInput,
   CityInput,
@@ -87,25 +96,40 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
 
 interface FormShiftPickerRowProps
   extends ChildFormEntryProps,
-    IUpdateSeniority {
+    IUpdateSeniority, IUpdateShifts {
 }
 
 const FormShiftPickerRow: ForwardRefExoticComponent<
   FormShiftPickerRowProps & RefAttributes<any>
 > = forwardRef(
   (
-    { entryId, required, updateSeniority }: FormShiftPickerRowProps,
+    { entryId, required, updateSeniority, updateShifts }: FormShiftPickerRowProps,
     ref: ForwardedRef<any>
   ) => {
+    const seniorityRef: MutableRefObject<unknown> = useRef(null);
+    const shiftRef: MutableRefObject<unknown> = useRef(null);
+
+    useImperativeHandle(ref, () => {
+      return {
+        senior: seniorityRef,
+        shift: shiftRef
+      };
+    });
+
     return (
       <div className="registration-form__row has-after">
-        <ShiftInput entryId={entryId} isRequired={required} />
+        <ShiftInput
+          entryId={entryId}
+          isRequired={required}
+          updateShifts={updateShifts}
+          ref={shiftRef}
+        />
         <ShirtInput entryId={entryId} isRequired={required} />
         <SeniorityInput
           updateSeniority={updateSeniority}
           entryId={entryId}
           isRequired={required}
-          ref={ref}
+          ref={seniorityRef}
         />
       </div>
     );
@@ -148,7 +172,7 @@ const RemoveChildButton = ({
   );
 };
 
-interface ChildFormProps extends IUpdateSeniority {
+interface ChildFormProps extends IUpdateSeniority, IUpdateShifts {
   entryId: number;
   childCount: number;
   removeChildCard: () => void;
@@ -158,7 +182,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
   ChildFormProps & RefAttributes<any>
 > = forwardRef(
   (
-    { entryId, childCount, removeChildCard, updateSeniority }: ChildFormProps,
+    { entryId, childCount, removeChildCard, updateSeniority, updateShifts }: ChildFormProps,
     ref: ForwardedRef<any>
   ) => {
     const [useIDCode, setUseIDCode] = useState<boolean>(true);
@@ -195,6 +219,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
           entryId={entryId}
           required={isVisible}
           updateSeniority={updateSeniority}
+          updateShifts={updateShifts}
           ref={ref}
         />
         <p>Elukoht:</p>
@@ -264,32 +289,34 @@ const RegistrationForm = () => {
   const maxChildCount = 4;
   const upfrontRegistrationFee = 100;
   const shiftFullPrice = 240;
+  const shortDiscount = 20;
   const seniorityDiscount = 20;
 
   const [childCount, setChildCount] = useState<number>(1);
   const [canAddMoreChildren, setCanAddMoreChildren] = useState<boolean>(true);
   const [seniorityStatuses, setSeniorityStatuses] = useState<boolean[]>([]);
+  const [shifts, setShifts] = useState<number[]>([]);
 
-  // References for the radio boxes that define seniority status.
-  // We need the references to re-read the pre-filled values in Firefox if a
-  // user refreshes or navigates back to the page.
-  const senioritiesRef: MutableRefObject<unknown> = useRef(null);
-
-  // Read the radio box values using the references, and pre-populate the
-  // price-info array containing seniority statuses.
+  const childrenRef: MutableRefObject<unknown> = useRef(null);
   useEffect(() => {
     const initialSeniorityStatuses: boolean[] = [];
-    (senioritiesRef.current as Map<number, any>).forEach(
-      (value: HTMLInputElement) => {
-        initialSeniorityStatuses.push(value.checked);
+    const initialShifts: number[] = [];
+
+    (childrenRef.current as Map<number, any>).forEach(
+      value => {
+        initialSeniorityStatuses.push(value.senior.current.checked);
+        initialShifts.push(parseInt(value.shift.current.value, 10) || 0);
       }
     );
+
     setSeniorityStatuses(initialSeniorityStatuses);
+    setShifts(initialShifts);
   }, []);
 
   const getUpdatedPrice = (): number => {
     let totalShiftPrice: number = childCount * shiftFullPrice;
     for (let i = 0; i < childCount; ++i) {
+      if (shifts[i] === 1) totalShiftPrice -= shortDiscount;
       if (seniorityStatuses[i]) totalShiftPrice -= seniorityDiscount;
     }
     return totalShiftPrice;
@@ -303,6 +330,16 @@ const RegistrationForm = () => {
       }
     );
     setSeniorityStatuses(nextSeniorityStatuses);
+  };
+
+  const updateShifts = (entryId: number, shiftNr: string) => {
+    const nextShifts: number[] = shifts.map(
+      (status: number, idx: number): number => {
+        if (idx === entryId) return parseInt(shiftNr, 10) || 0;
+        return status;
+      }
+    );
+    setShifts(nextShifts);
   };
 
   const addChildCard = () => {
@@ -320,10 +357,10 @@ const RegistrationForm = () => {
   };
 
   const getMap = (): Map<number, any> => {
-    if (!senioritiesRef.current) {
-      senioritiesRef.current = new Map<number, any>();
+    if (!childrenRef.current) {
+      childrenRef.current = new Map<number, any>();
     }
-    return senioritiesRef.current as Map<number, any>;
+    return childrenRef.current as Map<number, any>;
   };
 
   const registrationFee: number = childCount * upfrontRegistrationFee;
@@ -343,6 +380,7 @@ const RegistrationForm = () => {
           childCount={childCount}
           removeChildCard={removeChildCard}
           updateSeniority={updateSeniority}
+          updateShifts={updateShifts}
           ref={(node) => {
             const map: Map<number, any> = getMap();
             if (node) {
