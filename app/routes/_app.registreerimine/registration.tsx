@@ -8,12 +8,15 @@ import React, {
   useEffect,
   useImperativeHandle,
   useRef,
-  useState
+  useState,
 } from "react";
 
 import { InfoBanner, WarningBanner } from "~/components/banners";
 
-import type { IUpdateSeniority, IUpdateShifts } from "~/routes/_app.registreerimine/inputs";
+import type {
+  IUpdateSeniority,
+  IUpdateShifts,
+} from "~/routes/_app.registreerimine/inputs";
 import {
   AddendumInput,
   CityInput,
@@ -32,7 +35,7 @@ import {
   ShiftInput,
   ShirtInput,
   TermsAcknowledgeInput,
-  UseIDCodeInput
+  UseIDCodeInput,
 } from "~/routes/_app.registreerimine/inputs";
 
 interface ChildFormEntryProps {
@@ -45,10 +48,10 @@ interface FormChildBasicRowProps extends ChildFormEntryProps {
 }
 
 const FormChildBasicRow = ({
-                             entryId,
-                             required,
-                             useIDCode
-                           }: FormChildBasicRowProps) => {
+  entryId,
+  required,
+  useIDCode,
+}: FormChildBasicRowProps) => {
   return (
     <div className="registration-form__row has-after">
       <NameInput entryId={entryId} isRequired={required} />
@@ -80,7 +83,7 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
 > = forwardRef(
   (
     { entryId, setUseIDCode }: FormUseIDCodeRowProps,
-    ref: ForwardedRef<any>
+    ref: ForwardedRef<any>,
   ) => {
     return (
       <div className="registration-form__row registration-form__row--minor">
@@ -91,20 +94,25 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
         />
       </div>
     );
-  }
+  },
 );
 
 interface FormShiftPickerRowProps
   extends ChildFormEntryProps,
-    IUpdateSeniority, IUpdateShifts {
-}
+    IUpdateSeniority,
+    IUpdateShifts {}
 
 const FormShiftPickerRow: ForwardRefExoticComponent<
   FormShiftPickerRowProps & RefAttributes<any>
 > = forwardRef(
   (
-    { entryId, required, updateSeniority, updateShifts }: FormShiftPickerRowProps,
-    ref: ForwardedRef<any>
+    {
+      entryId,
+      required,
+      updateSeniority,
+      updateShifts,
+    }: FormShiftPickerRowProps,
+    ref: ForwardedRef<any>,
   ) => {
     const seniorityRef: MutableRefObject<unknown> = useRef(null);
     const shiftRef: MutableRefObject<unknown> = useRef(null);
@@ -112,7 +120,7 @@ const FormShiftPickerRow: ForwardRefExoticComponent<
     useImperativeHandle(ref, () => {
       return {
         senior: seniorityRef,
-        shift: shiftRef
+        shift: shiftRef,
       };
     });
 
@@ -133,7 +141,7 @@ const FormShiftPickerRow: ForwardRefExoticComponent<
         />
       </div>
     );
-  }
+  },
 );
 
 const FormAddressRow = ({ entryId, required }: ChildFormEntryProps) => {
@@ -162,10 +170,10 @@ interface RemoveChildButtonProps {
 }
 
 const RemoveChildButton = ({
-                             entryId,
-                             childCount,
-                             removeChildCard
-                           }: RemoveChildButtonProps): null | JSX.Element => {
+  entryId,
+  childCount,
+  removeChildCard,
+}: RemoveChildButtonProps): null | JSX.Element => {
   if (entryId !== childCount - 1 || childCount === 1) return null;
   return (
     <div className="registration-form__close" onClick={removeChildCard}></div>
@@ -182,8 +190,14 @@ const ChildFormEntry: ForwardRefExoticComponent<
   ChildFormProps & RefAttributes<any>
 > = forwardRef(
   (
-    { entryId, childCount, removeChildCard, updateSeniority, updateShifts }: ChildFormProps,
-    ref: ForwardedRef<any>
+    {
+      entryId,
+      childCount,
+      removeChildCard,
+      updateSeniority,
+      updateShifts,
+    }: ChildFormProps,
+    ref: ForwardedRef<any>,
   ) => {
     const [useIDCode, setUseIDCode] = useState<boolean>(true);
     const idCodeCheckboxRef: MutableRefObject<null> = useRef(null);
@@ -227,7 +241,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
         <FormAddendumRow entryId={entryId} required={isVisible} />
       </div>
     );
-  }
+  },
 );
 
 const ParentFormEntry = () => {
@@ -252,9 +266,9 @@ interface AddChildButtonProps {
 }
 
 const AddChildButton = ({
-                          isActive,
-                          addChildCard
-                        }: AddChildButtonProps): null | JSX.Element => {
+  isActive,
+  addChildCard,
+}: AddChildButtonProps): null | JSX.Element => {
   if (!isActive) return null;
   return (
     <div className="registration-form__unit registration-form__unit--mt0">
@@ -269,7 +283,24 @@ const AddChildButton = ({
 };
 
 const RegistrationSubmitButton = () => {
-  const isDisabled: boolean = true;
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+
+  const unlockTime = new Date(Date.parse("01 Jan 2024 11:59:59 UTC")).getTime();
+  const now = Date.now();
+
+  useEffect(() => {
+    if (now > unlockTime) {
+      setIsDisabled(false);
+      return () => {};
+    }
+
+    const eta = unlockTime - now;
+    console.log(`Unlock ETA: ${eta}`);
+    const timer = setTimeout(() => {
+      setIsDisabled(false);
+    }, eta);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <button
@@ -302,12 +333,10 @@ const RegistrationForm = () => {
     const initialSeniorityStatuses: boolean[] = [];
     const initialShifts: number[] = [];
 
-    (childrenRef.current as Map<number, any>).forEach(
-      value => {
-        initialSeniorityStatuses.push(value.senior.current.checked);
-        initialShifts.push(parseInt(value.shift.current.value, 10) || 0);
-      }
-    );
+    (childrenRef.current as Map<number, any>).forEach((value) => {
+      initialSeniorityStatuses.push(value.senior.current.checked);
+      initialShifts.push(parseInt(value.shift.current.value, 10) || 0);
+    });
 
     setSeniorityStatuses(initialSeniorityStatuses);
     setShifts(initialShifts);
@@ -327,7 +356,7 @@ const RegistrationForm = () => {
       (status: boolean, idx: number): boolean => {
         if (idx === entryId) return isSenior;
         return status;
-      }
+      },
     );
     setSeniorityStatuses(nextSeniorityStatuses);
   };
@@ -337,7 +366,7 @@ const RegistrationForm = () => {
       (status: number, idx: number): number => {
         if (idx === entryId) return parseInt(shiftNr, 10) || 0;
         return status;
-      }
+      },
     );
     setShifts(nextShifts);
   };
@@ -424,10 +453,10 @@ export const RegistrationSection = () => {
           <p>Registreerimine algab 01.01.2024 kell 14:00 Eesti aja järgi.</p>
         </WarningBanner>
         <WarningBanner>
-          <b>NB!</b> Registreerimiskinnitus ei ole enam
-          automaatne. Registreerimiskinnituse saate meilile siis, kui juhataja
-          on koha kinnitanud. Kohtade kinnitamine toimub endiselt ajalise
-          järjekorra põhiselt.
+          <b>NB!</b> Registreerimiskinnitus ei ole enam automaatne.
+          Registreerimiskinnituse saate meilile siis, kui juhataja on koha
+          kinnitanud. Kohtade kinnitamine toimub endiselt ajalise järjekorra
+          põhiselt.
         </WarningBanner>
         <InfoBanner>
           Vabade kohtade puudumisel saate registreeruda reservnimekirja selle

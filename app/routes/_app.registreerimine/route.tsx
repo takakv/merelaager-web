@@ -139,6 +139,7 @@ const FreeSpaceSection = () => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   await formAction(await request.formData());
+  return null;
 };
 
 export default function RegistrationRoute() {
