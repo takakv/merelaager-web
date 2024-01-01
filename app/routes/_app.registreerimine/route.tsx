@@ -1,4 +1,8 @@
-import type { ActionFunctionArgs, MetaDescriptor, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  MetaDescriptor,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useActionData, useLoaderData } from "@remix-run/react";
 
@@ -11,11 +15,12 @@ import Email from "~/components/email";
 
 import { RegistrationSection } from "~/routes/_app.registreerimine/registration";
 import { formAction } from "~/routes/_app.registreerimine/action";
+import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {
   return genMetaData(
     MetaConstants.REGISTREERIMINE,
-    "/registreerimine"
+    "/registreerimine",
   ) as MetaDescriptor[];
 };
 
@@ -26,8 +31,8 @@ export const loader = async () => {
       bossEmail: true,
       bossPhone: true,
       boySlots: true,
-      girlSlots: true
-    }
+      girlSlots: true,
+    },
   });
 
   const registrationCounts: { [shiftNr: number]: { M: number; F: number } } =
@@ -38,16 +43,16 @@ export const loader = async () => {
 
   const registrations = await prisma.registration.findMany({
     where: {
-      isRegistered: true
+      isRegistered: true,
     },
     select: {
       shiftNr: true,
       children: {
         select: {
-          gender: true
-        }
-      }
-    }
+          gender: true,
+        },
+      },
+    },
   });
 
   registrations.forEach((registration) => {
@@ -56,7 +61,7 @@ export const loader = async () => {
 
   return json({
     shifts,
-    registrationCounts
+    registrationCounts,
   });
 };
 
@@ -87,12 +92,12 @@ interface FreeSpaceCardProps {
 }
 
 const FreeSpaceCard = ({
-                         shiftNr,
-                         username,
-                         phone,
-                         freeBoySlots,
-                         freeGirlSlots
-                       }: FreeSpaceCardProps) => {
+  shiftNr,
+  username,
+  phone,
+  freeBoySlots,
+  freeGirlSlots,
+}: FreeSpaceCardProps) => {
   return (
     <div className="c-regfree">
       <h4 className="u-text-center">{shiftNr}. vahetus</h4>
@@ -138,12 +143,19 @@ const FreeSpaceSection = () => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  await formAction(await request.formData());
-  return null;
+  const response = await formAction(await request.formData());
+  console.log(response);
+  return json(response);
 };
 
 export default function RegistrationRoute() {
   const actionData = useActionData<typeof action>();
+
+  useEffect(() => {
+    if (!actionData || actionData.ok) return;
+
+    alert(`Registreerimine ei õnnestunud.\n\nPõhjus: ${actionData.message}`);
+  }, [actionData]);
 
   return (
     <main>

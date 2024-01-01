@@ -159,7 +159,6 @@ export const ShiftInput: ForwardRefExoticComponent<
                 ref: ForwardedRef<any>) => {
     const handleSelection = ({ target }: ChangeEvent) => {
       const value: string = (target as HTMLSelectElement).value;
-      console.log(value);
       updateShifts(entryId, value);
     };
 

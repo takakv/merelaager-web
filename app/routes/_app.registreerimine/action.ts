@@ -57,7 +57,6 @@ export const formAction = async (form: FormData) => {
   for (let i = 0; i < childCount; ++i) {
     useIdCodes.push(!form.get(`useIdCode-${i}`));
   }
-  console.log(`useIdCodes: ${useIdCodes}`);
 
   const regData: RegPayload = {
     children: [],
@@ -99,6 +98,5 @@ export const formAction = async (form: FormData) => {
     body: JSON.stringify(regData),
   });
 
-  const jsonRes = await response.json();
-  console.log(jsonRes);
+  return response.json();
 };
