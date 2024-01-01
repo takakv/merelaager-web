@@ -449,9 +449,9 @@ export const RegistrationSection = () => {
     <section className="c-section">
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
-        <WarningBanner>
+        {/*<WarningBanner>
           <p>Registreerimine algab 01.01.2024 kell 14:00 Eesti aja järgi.</p>
-        </WarningBanner>
+        </WarningBanner>*/}
         <WarningBanner>
           <b>NB!</b> Registreerimiskinnitus ei ole enam automaatne.
           Registreerimiskinnituse saate meilile siis, kui juhataja on koha
