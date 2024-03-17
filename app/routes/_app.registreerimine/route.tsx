@@ -33,13 +33,17 @@ export const loader = async () => {
       bossPhone: true,
       boySlots: true,
       girlSlots: true,
+      boySlotsReserve: true,
+      girlSlotsReserve: true,
     },
   });
 
-  const registrationCounts: { [shiftNr: number]: { M: number; F: number } } =
-    {};
+  const remainingSlots: { [shiftNr: number]: { M: number; F: number } } = {};
   shifts.forEach((shift) => {
-    registrationCounts[shift.id] = { M: shift.boySlots, F: shift.girlSlots };
+    remainingSlots[shift.id] = {
+      M: shift.boySlots - shift.boySlotsReserve,
+      F: shift.girlSlots - shift.girlSlotsReserve,
+    };
   });
 
   const registrations = await prisma.registration.findMany({
@@ -57,12 +61,12 @@ export const loader = async () => {
   });
 
   registrations.forEach((registration) => {
-    registrationCounts[registration.shiftNr][registration.children.gender] -= 1;
+    remainingSlots[registration.shiftNr][registration.children.gender] -= 1;
   });
 
   return json({
     shifts,
-    registrationCounts,
+    remainingSlots,
   });
 };
 
@@ -117,7 +121,7 @@ const FreeSpaceCard = ({
 };
 
 const FreeSpaceSection = () => {
-  const { shifts, registrationCounts } = useLoaderData<typeof loader>();
+  const { shifts, remainingSlots } = useLoaderData<typeof loader>();
 
   const freeSpaceCards = shifts.map((shift) => {
     const shiftNr = shift.id;
@@ -127,8 +131,8 @@ const FreeSpaceSection = () => {
         shiftNr={shiftNr}
         username={shift.bossEmail.split("@")[0]}
         phone={shift.bossPhone}
-        freeBoySlots={registrationCounts[shiftNr].M}
-        freeGirlSlots={registrationCounts[shiftNr].F}
+        freeBoySlots={remainingSlots[shiftNr].M}
+        freeGirlSlots={remainingSlots[shiftNr].F}
       />
     );
   });
@@ -165,6 +169,7 @@ export default function RegistrationRoute() {
   return (
     <main>
       <RefsSection />
+      <FreeSpaceSection />
       <RegistrationSection />
     </main>
   );
