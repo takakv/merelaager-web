@@ -1,5 +1,10 @@
-import type { ActionFunctionArgs, MetaDescriptor, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  json,
+  MetaDescriptor,
+  MetaFunction,
+  redirect,
+} from "@remix-run/node";
 import { Link, useActionData, useLoaderData } from "@remix-run/react";
 
 import { prisma } from "~/db.server";
@@ -11,11 +16,12 @@ import Email from "~/components/email";
 
 import { RegistrationSection } from "~/routes/_app.registreerimine/registration";
 import { formAction } from "~/routes/_app.registreerimine/action";
+import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {
   return genMetaData(
     MetaConstants.REGISTREERIMINE,
-    "/registreerimine"
+    "/registreerimine",
   ) as MetaDescriptor[];
 };
 
@@ -26,37 +32,41 @@ export const loader = async () => {
       bossEmail: true,
       bossPhone: true,
       boySlots: true,
-      girlSlots: true
-    }
+      girlSlots: true,
+      boySlotsReserve: true,
+      girlSlotsReserve: true,
+    },
   });
 
-  const registrationCounts: { [shiftNr: number]: { M: number; F: number } } =
-    {};
+  const remainingSlots: { [shiftNr: number]: { M: number; F: number } } = {};
   shifts.forEach((shift) => {
-    registrationCounts[shift.id] = { M: shift.boySlots, F: shift.girlSlots };
+    remainingSlots[shift.id] = {
+      M: shift.boySlots - shift.boySlotsReserve,
+      F: shift.girlSlots - shift.girlSlotsReserve,
+    };
   });
 
   const registrations = await prisma.registration.findMany({
     where: {
-      isRegistered: true
+      isRegistered: true,
     },
     select: {
       shiftNr: true,
       children: {
         select: {
-          gender: true
-        }
-      }
-    }
+          gender: true,
+        },
+      },
+    },
   });
 
   registrations.forEach((registration) => {
-    registrationCounts[registration.shiftNr][registration.children.gender] -= 1;
+    remainingSlots[registration.shiftNr][registration.children.gender] -= 1;
   });
 
   return json({
     shifts,
-    registrationCounts
+    remainingSlots,
   });
 };
 
@@ -87,12 +97,12 @@ interface FreeSpaceCardProps {
 }
 
 const FreeSpaceCard = ({
-                         shiftNr,
-                         username,
-                         phone,
-                         freeBoySlots,
-                         freeGirlSlots
-                       }: FreeSpaceCardProps) => {
+  shiftNr,
+  username,
+  phone,
+  freeBoySlots,
+  freeGirlSlots,
+}: FreeSpaceCardProps) => {
   return (
     <div className="c-regfree">
       <h4 className="u-text-center">{shiftNr}. vahetus</h4>
@@ -111,7 +121,7 @@ const FreeSpaceCard = ({
 };
 
 const FreeSpaceSection = () => {
-  const { shifts, registrationCounts } = useLoaderData<typeof loader>();
+  const { shifts, remainingSlots } = useLoaderData<typeof loader>();
 
   const freeSpaceCards = shifts.map((shift) => {
     const shiftNr = shift.id;
@@ -121,8 +131,8 @@ const FreeSpaceSection = () => {
         shiftNr={shiftNr}
         username={shift.bossEmail.split("@")[0]}
         phone={shift.bossPhone}
-        freeBoySlots={registrationCounts[shiftNr].M}
-        freeGirlSlots={registrationCounts[shiftNr].F}
+        freeBoySlots={remainingSlots[shiftNr].M}
+        freeGirlSlots={remainingSlots[shiftNr].F}
       />
     );
   });
@@ -138,15 +148,28 @@ const FreeSpaceSection = () => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  await formAction(await request.formData());
+  const response = await formAction(await request.formData());
+  console.log(response);
+  if (response.ok) {
+    return redirect("/registreerimine/edu");
+  }
+
+  return json(response);
 };
 
 export default function RegistrationRoute() {
   const actionData = useActionData<typeof action>();
 
+  useEffect(() => {
+    if (!actionData || actionData.ok) return;
+
+    alert(`Registreerimine ei õnnestunud.\n\nPõhjus: ${actionData.message}`);
+  }, [actionData]);
+
   return (
     <main>
       <RefsSection />
+      <FreeSpaceSection />
       <RegistrationSection />
     </main>
   );

@@ -1,10 +1,22 @@
 import { Form } from "@remix-run/react";
-import type { ForwardedRef, ForwardRefExoticComponent, MutableRefObject, RefAttributes } from "react";
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  ForwardRefExoticComponent,
+  MutableRefObject,
+  RefAttributes,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
 import { InfoBanner, WarningBanner } from "~/components/banners";
 
-import type { IUpdateSeniority } from "~/routes/_app.registreerimine/inputs";
+import type {
+  IUpdateSeniority,
+  IUpdateShifts,
+} from "~/routes/_app.registreerimine/inputs";
 import {
   AddendumInput,
   CityInput,
@@ -23,7 +35,7 @@ import {
   ShiftInput,
   ShirtInput,
   TermsAcknowledgeInput,
-  UseIDCodeInput
+  UseIDCodeInput,
 } from "~/routes/_app.registreerimine/inputs";
 
 interface ChildFormEntryProps {
@@ -36,10 +48,10 @@ interface FormChildBasicRowProps extends ChildFormEntryProps {
 }
 
 const FormChildBasicRow = ({
-                             entryId,
-                             required,
-                             useIDCode
-                           }: FormChildBasicRowProps) => {
+  entryId,
+  required,
+  useIDCode,
+}: FormChildBasicRowProps) => {
   return (
     <div className="registration-form__row has-after">
       <NameInput entryId={entryId} isRequired={required} />
@@ -71,7 +83,7 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
 > = forwardRef(
   (
     { entryId, setUseIDCode }: FormUseIDCodeRowProps,
-    ref: ForwardedRef<any>
+    ref: ForwardedRef<any>,
   ) => {
     return (
       <div className="registration-form__row registration-form__row--minor">
@@ -82,34 +94,54 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
         />
       </div>
     );
-  }
+  },
 );
 
 interface FormShiftPickerRowProps
   extends ChildFormEntryProps,
-    IUpdateSeniority {
-}
+    IUpdateSeniority,
+    IUpdateShifts {}
 
 const FormShiftPickerRow: ForwardRefExoticComponent<
   FormShiftPickerRowProps & RefAttributes<any>
 > = forwardRef(
   (
-    { entryId, required, updateSeniority }: FormShiftPickerRowProps,
-    ref: ForwardedRef<any>
+    {
+      entryId,
+      required,
+      updateSeniority,
+      updateShifts,
+    }: FormShiftPickerRowProps,
+    ref: ForwardedRef<any>,
   ) => {
+    const seniorityRef: MutableRefObject<unknown> = useRef(null);
+    const shiftRef: MutableRefObject<unknown> = useRef(null);
+
+    useImperativeHandle(ref, () => {
+      return {
+        senior: seniorityRef,
+        shift: shiftRef,
+      };
+    });
+
     return (
       <div className="registration-form__row has-after">
-        <ShiftInput entryId={entryId} isRequired={required} />
+        <ShiftInput
+          entryId={entryId}
+          isRequired={required}
+          updateShifts={updateShifts}
+          ref={shiftRef}
+        />
         <ShirtInput entryId={entryId} isRequired={required} />
         <SeniorityInput
           updateSeniority={updateSeniority}
           entryId={entryId}
           isRequired={required}
-          ref={ref}
+          ref={seniorityRef}
         />
       </div>
     );
-  }
+  },
 );
 
 const FormAddressRow = ({ entryId, required }: ChildFormEntryProps) => {
@@ -138,17 +170,17 @@ interface RemoveChildButtonProps {
 }
 
 const RemoveChildButton = ({
-                             entryId,
-                             childCount,
-                             removeChildCard
-                           }: RemoveChildButtonProps): null | JSX.Element => {
+  entryId,
+  childCount,
+  removeChildCard,
+}: RemoveChildButtonProps): null | JSX.Element => {
   if (entryId !== childCount - 1 || childCount === 1) return null;
   return (
     <div className="registration-form__close" onClick={removeChildCard}></div>
   );
 };
 
-interface ChildFormProps extends IUpdateSeniority {
+interface ChildFormProps extends IUpdateSeniority, IUpdateShifts {
   entryId: number;
   childCount: number;
   removeChildCard: () => void;
@@ -158,8 +190,14 @@ const ChildFormEntry: ForwardRefExoticComponent<
   ChildFormProps & RefAttributes<any>
 > = forwardRef(
   (
-    { entryId, childCount, removeChildCard, updateSeniority }: ChildFormProps,
-    ref: ForwardedRef<any>
+    {
+      entryId,
+      childCount,
+      removeChildCard,
+      updateSeniority,
+      updateShifts,
+    }: ChildFormProps,
+    ref: ForwardedRef<any>,
   ) => {
     const [useIDCode, setUseIDCode] = useState<boolean>(true);
     const idCodeCheckboxRef: MutableRefObject<null> = useRef(null);
@@ -195,6 +233,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
           entryId={entryId}
           required={isVisible}
           updateSeniority={updateSeniority}
+          updateShifts={updateShifts}
           ref={ref}
         />
         <p>Elukoht:</p>
@@ -202,7 +241,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
         <FormAddendumRow entryId={entryId} required={isVisible} />
       </div>
     );
-  }
+  },
 );
 
 const ParentFormEntry = () => {
@@ -227,9 +266,9 @@ interface AddChildButtonProps {
 }
 
 const AddChildButton = ({
-                          isActive,
-                          addChildCard
-                        }: AddChildButtonProps): null | JSX.Element => {
+  isActive,
+  addChildCard,
+}: AddChildButtonProps): null | JSX.Element => {
   if (!isActive) return null;
   return (
     <div className="registration-form__unit registration-form__unit--mt0">
@@ -244,7 +283,24 @@ const AddChildButton = ({
 };
 
 const RegistrationSubmitButton = () => {
-  const isDisabled: boolean = true;
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+
+  const unlockTime = new Date(Date.parse("01 Jan 2024 11:59:59 UTC")).getTime();
+  const now = Date.now();
+
+  useEffect(() => {
+    if (now > unlockTime) {
+      setIsDisabled(false);
+      return () => {};
+    }
+
+    const eta = unlockTime - now;
+    console.log(`Unlock ETA: ${eta}`);
+    const timer = setTimeout(() => {
+      setIsDisabled(false);
+    }, eta);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <button
@@ -264,32 +320,32 @@ const RegistrationForm = () => {
   const maxChildCount = 4;
   const upfrontRegistrationFee = 100;
   const shiftFullPrice = 240;
+  const shortDiscount = 20;
   const seniorityDiscount = 20;
 
   const [childCount, setChildCount] = useState<number>(1);
   const [canAddMoreChildren, setCanAddMoreChildren] = useState<boolean>(true);
   const [seniorityStatuses, setSeniorityStatuses] = useState<boolean[]>([]);
+  const [shifts, setShifts] = useState<number[]>([]);
 
-  // References for the radio boxes that define seniority status.
-  // We need the references to re-read the pre-filled values in Firefox if a
-  // user refreshes or navigates back to the page.
-  const senioritiesRef: MutableRefObject<unknown> = useRef(null);
-
-  // Read the radio box values using the references, and pre-populate the
-  // price-info array containing seniority statuses.
+  const childrenRef: MutableRefObject<unknown> = useRef(null);
   useEffect(() => {
     const initialSeniorityStatuses: boolean[] = [];
-    (senioritiesRef.current as Map<number, any>).forEach(
-      (value: HTMLInputElement) => {
-        initialSeniorityStatuses.push(value.checked);
-      }
-    );
+    const initialShifts: number[] = [];
+
+    (childrenRef.current as Map<number, any>).forEach((value) => {
+      initialSeniorityStatuses.push(value.senior.current.checked);
+      initialShifts.push(parseInt(value.shift.current.value, 10) || 0);
+    });
+
     setSeniorityStatuses(initialSeniorityStatuses);
+    setShifts(initialShifts);
   }, []);
 
   const getUpdatedPrice = (): number => {
     let totalShiftPrice: number = childCount * shiftFullPrice;
     for (let i = 0; i < childCount; ++i) {
+      if (shifts[i] === 1) totalShiftPrice -= shortDiscount;
       if (seniorityStatuses[i]) totalShiftPrice -= seniorityDiscount;
     }
     return totalShiftPrice;
@@ -300,9 +356,19 @@ const RegistrationForm = () => {
       (status: boolean, idx: number): boolean => {
         if (idx === entryId) return isSenior;
         return status;
-      }
+      },
     );
     setSeniorityStatuses(nextSeniorityStatuses);
+  };
+
+  const updateShifts = (entryId: number, shiftNr: string) => {
+    const nextShifts: number[] = shifts.map(
+      (status: number, idx: number): number => {
+        if (idx === entryId) return parseInt(shiftNr, 10) || 0;
+        return status;
+      },
+    );
+    setShifts(nextShifts);
   };
 
   const addChildCard = () => {
@@ -320,10 +386,10 @@ const RegistrationForm = () => {
   };
 
   const getMap = (): Map<number, any> => {
-    if (!senioritiesRef.current) {
-      senioritiesRef.current = new Map<number, any>();
+    if (!childrenRef.current) {
+      childrenRef.current = new Map<number, any>();
     }
-    return senioritiesRef.current as Map<number, any>;
+    return childrenRef.current as Map<number, any>;
   };
 
   const registrationFee: number = childCount * upfrontRegistrationFee;
@@ -343,6 +409,7 @@ const RegistrationForm = () => {
           childCount={childCount}
           removeChildCard={removeChildCard}
           updateSeniority={updateSeniority}
+          updateShifts={updateShifts}
           ref={(node) => {
             const map: Map<number, any> = getMap();
             if (node) {
@@ -382,14 +449,14 @@ export const RegistrationSection = () => {
     <section className="c-section">
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
-        <WarningBanner>
+        {/*<WarningBanner>
           <p>Registreerimine algab 01.01.2024 kell 14:00 Eesti aja järgi.</p>
-        </WarningBanner>
+        </WarningBanner>*/}
         <WarningBanner>
-          <b>NB!</b> Registreerimiskinnitus ei ole enam
-          automaatne. Registreerimiskinnituse saate meilile siis, kui juhataja
-          on koha kinnitanud. Kohtade kinnitamine toimub endiselt ajalise
-          järjekorra põhiselt.
+          <b>NB!</b> Registreerimiskinnitus ei ole enam automaatne.
+          Registreerimiskinnituse saate meilile siis, kui juhataja on koha
+          kinnitanud. Kohtade kinnitamine toimub endiselt ajalise järjekorra
+          põhiselt.
         </WarningBanner>
         <InfoBanner>
           Vabade kohtade puudumisel saate registreeruda reservnimekirja selle

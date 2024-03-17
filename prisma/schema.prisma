@@ -73,9 +73,9 @@ model Record {
 
 model Registration {
   id            Int        @id @default(autoincrement()) @db.UnsignedInt
-  childId       Int?
+  childId       Int
   idCode        String?    @db.VarChar(255)
-  shiftNr       Int?
+  shiftNr       Int
   isRegistered  Boolean    @default(false)
   regOrder      Int        @db.UnsignedInt
   isOld         Boolean    @default(true)
@@ -96,7 +96,7 @@ model Registration {
   updatedAt     DateTime   @db.DateTime(0)
   notifSent     Boolean?   @default(false)
   billId        Int?       @db.UnsignedInt
-  children      Child?     @relation(fields: [childId], references: [id], onDelete: NoAction, map: "registrations_ibfk_134")
+  children      Child      @relation(fields: [childId], references: [id], onDelete: NoAction, map: "registrations_ibfk_134")
   shifts        ShiftInfo? @relation(fields: [shiftNr], references: [id], onDelete: NoAction, map: "registrations_ibfk_135")
   bills         bills?     @relation(fields: [billId], references: [id], map: "registrations_ibfk_199")
 
@@ -186,19 +186,21 @@ model GeneralInfo {
 }
 
 model ShiftInfo {
-  id            Int            @id
-  bossName      String?        @db.VarChar(255)
-  bossEmail     String?        @db.VarChar(255)
-  bossPhone     String?        @db.VarChar(255)
-  startDate     DateTime?      @db.Date
-  length        Int?           @db.UnsignedInt
-  createdAt     DateTime       @db.DateTime(0)
-  updatedAt     DateTime       @db.DateTime(0)
-  bossId        Int?           @db.UnsignedInt
-  boySlots      Int            @default(20) @db.UnsignedInt
-  girlSlots     Int            @default(20) @db.UnsignedInt
-  registrations Registration[]
-  boss          User?          @relation(fields: [bossId], references: [id], onDelete: NoAction, map: "shifts_ibfk_1")
+  id               Int            @id
+  bossName         String         @db.VarChar(255)
+  bossEmail        String         @db.VarChar(255)
+  bossPhone        String         @db.VarChar(255)
+  startDate        DateTime       @db.Date
+  length           Int            @db.UnsignedInt
+  createdAt        DateTime       @db.DateTime(0)
+  updatedAt        DateTime       @db.DateTime(0)
+  bossId           Int?           @db.UnsignedInt
+  boySlots         Int            @default(20) @db.UnsignedInt
+  girlSlots        Int            @default(20) @db.UnsignedInt
+  boySlotsReserve  Int            @default(2) @db.UnsignedInt
+  girlSlotsReserve Int            @default(2) @db.UnsignedInt
+  registrations    Registration[]
+  boss             User?          @relation(fields: [bossId], references: [id], onDelete: NoAction, map: "shifts_ibfk_1")
 
   @@index([bossId], map: "bossId")
   @@map("shifts")
