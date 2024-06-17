@@ -21,18 +21,26 @@ export interface QuickLink {
 }
 
 export const landingQuickLinks: QuickLink[] = [
-  {
+  /*{
     href: "/registreerimine/",
     content: "Registreerimine"
+  },*/
+  {
+    href: "/info/laagrist/#asukoht",
+    content: "Asukoht ja kogunemine"
+  },
+  {
+    href: "/info/laagrist/#laagrisse-kaasa",
+    content: "Laagrisse kaasa"
   },
   {
     href: "/info/vahetused/#ajad",
     content: "Laagrivahetuste ajad"
   },
-  {
+  /*{
     href: "/info/maksmine/#maksumus",
     content: "Hinnad"
-  }
+  }*/
 ];
 
 export interface ShiftInfo {

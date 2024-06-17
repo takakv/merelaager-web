@@ -41,12 +41,6 @@ const LocationSection = () => {
           </Link>
           .
         </p>
-        <p>
-          Laagriasjade pakkimisel palume arvestada, et peatuste Pääsküla-Keila
-          vahel toimub ümberistumine asendus bussi – see tähendab, et asjad
-          oleksid pakitud võimalikult kompaktselt, et mõni lisa kott ei ununeks
-          rongi ega bussi 🙂.
-        </p>
         <p className="u-mt-1em">
           <b>Juhised autoga tulijale:</b> Sõitke Paldiski poole. Lõunasadama
           ristmikult (Alexela bensiinijaama juurest) keerake vasakule.
