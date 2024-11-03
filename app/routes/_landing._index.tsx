@@ -151,7 +151,7 @@ const PromoSection = () => {
             vastava väljaõppe saanud kasvatajat.
           </p>
           <p className="u-mb-15">
-            Laoküla merelaagrit korraldatakse {YEAR}. aasta suvel juba{" "}
+            Laoküla merelaagrit korraldati {YEAR}. aasta suvel{" "}
             {YEAR - 1998}. korda.
           </p>
         </div>
