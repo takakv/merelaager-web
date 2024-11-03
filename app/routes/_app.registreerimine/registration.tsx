@@ -285,6 +285,7 @@ const AddChildButton = ({
 const RegistrationSubmitButton = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
 
+  /*
   const unlockTime = new Date(Date.parse("01 Jan 2024 11:59:59 UTC")).getTime();
   const now = Date.now();
 
@@ -301,6 +302,7 @@ const RegistrationSubmitButton = () => {
     }, eta);
     return () => clearTimeout(timer);
   }, []);
+  */
 
   return (
     <button
@@ -449,10 +451,10 @@ export const RegistrationSection = () => {
     <section className="c-section">
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
-        {/*<WarningBanner>
-          <p>Registreerimine algab 01.01.2024 kell 14:00 Eesti aja järgi.</p>
-        </WarningBanner>*/}
         <WarningBanner>
+          <p>Registreerimine on suletud!</p>
+        </WarningBanner>
+        {/*<WarningBanner>
           <b>NB!</b> Registreerimiskinnitus ei ole enam automaatne.
           Registreerimiskinnituse saate meilile siis, kui juhataja on koha
           kinnitanud. Kohtade kinnitamine toimub endiselt ajalise järjekorra
@@ -461,7 +463,7 @@ export const RegistrationSection = () => {
         <InfoBanner>
           Vabade kohtade puudumisel saate registreeruda reservnimekirja selle
           sama vormi abil.
-        </InfoBanner>
+        </InfoBanner>*/}
         <RegistrationForm />
       </div>
     </section>
