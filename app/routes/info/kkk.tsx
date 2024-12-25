@@ -2,6 +2,7 @@ import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
+import { JSX } from "react";
 
 export const meta: MetaFunction = () => {
   return genMetaData(

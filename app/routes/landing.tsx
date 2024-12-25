@@ -1,5 +1,4 @@
 import type { LinksFunction, MetaDescriptor, MetaFunction } from "react-router";
-//import { json } from "node";
 import { Link, useLoaderData } from "react-router";
 import type { ReactElement } from "react";
 import React, { Fragment, useState, useRef, createRef, RefObject } from "react";

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Fragment } from "react";
+import { Fragment, JSX } from "react";
 import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import { genMetaData } from "~/utils/metagen";
