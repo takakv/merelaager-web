@@ -5,7 +5,7 @@ import type { MetaDescriptor, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
 import Email from "~/components/email";
-import { InfoBanner } from "~/components/banners";
+import { InfoBanner, WarningBanner } from "~/components/banners";
 
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
@@ -307,6 +307,13 @@ const ShiftDatesSection = () => {
     <section className="c-section" id="ajad">
       <div className="o-container">
         <h3 className="c-section-heading">{shiftYear} Laagrivahetuste ajad</h3>
+        <WarningBanner>
+          Tähelepanu!
+          Kuvatud kuupäevad on merelaagri 2025 <strong>prognoositud</strong> kuupäevad.
+          Kuupäevad võivad erakorraliste põhjuste tõttu muutuda 10.01.2025.
+          Seetõttu algab registreerimine 12.01.2025 kell 14.00.
+          Rohkem infot peagi.
+        </WarningBanner>
         <CalendarsComponent shifts={shifts} />
         <ShiftInfoComponent shifts={shifts} />
       </div>

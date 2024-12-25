@@ -452,7 +452,8 @@ export const RegistrationSection = () => {
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
         <WarningBanner>
-          <p>Registreerimine on suletud!</p>
+          Registreerimine algab 12.01.2025 kell 14.00.
+          Laagrivahetuste kuupäevad võivad muutuda kuni 10.01.2025!
         </WarningBanner>
         {/*<WarningBanner>
           <b>NB!</b> Registreerimiskinnitus ei ole enam automaatne.

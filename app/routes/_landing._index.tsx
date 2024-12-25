@@ -151,8 +151,9 @@ const PromoSection = () => {
             vastava väljaõppe saanud kasvatajat.
           </p>
           <p className="u-mb-15">
-            Laoküla merelaagrit korraldati {YEAR}. aasta suvel{" "}
-            {YEAR - 1998}. korda.
+            {/*Laoküla merelaagrit korraldati {YEAR}. aasta suvel{" "}
+            {YEAR - 1998}. korda.*/}
+            Laoküla merelaagrit korraldati 2024. aasta suvel 26. korda.
           </p>
         </div>
         <div className="c-home-block-media">

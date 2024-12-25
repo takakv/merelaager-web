@@ -10,7 +10,7 @@
 // to "toggle" the year swap. As such, this constant should be used wherever the
 // information year is needed (i.e., everywhere aside from immutable, static years
 // or copyright).
-export const YEAR: number = 2024;
+export const YEAR: number = 2025;
 
 export const LANDING_TAGLINE: string = "Kohtumiseni suvel";
 export const LANDING_SUBTEXT: string = "- Merelaager -";
@@ -25,14 +25,14 @@ export const landingQuickLinks: QuickLink[] = [
     href: "/registreerimine/",
     content: "Registreerimine"
   },*/
-  {
+  /*{
     href: "/info/laagrist/#asukoht",
     content: "Asukoht ja kogunemine"
   },
   {
     href: "/info/laagrist/#laagrisse-kaasa",
     content: "Laagrisse kaasa"
-  },
+  },*/
   {
     href: "/info/vahetused/#ajad",
     content: "Laagrivahetuste ajad"
