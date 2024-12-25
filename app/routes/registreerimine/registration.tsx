@@ -1,14 +1,14 @@
-import { Form } from "@remix-run/react";
+import { Form } from "react-router";
 import React, {
-  ForwardedRef,
-  forwardRef,
-  ForwardRefExoticComponent,
-  MutableRefObject,
-  RefAttributes,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
+    ForwardedRef,
+    forwardRef,
+    ForwardRefExoticComponent, JSX,
+    RefAttributes,
+    RefObject,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState,
 } from "react";
 
 import { InfoBanner, WarningBanner } from "~/components/banners";
@@ -114,8 +114,8 @@ const FormShiftPickerRow: ForwardRefExoticComponent<
     }: FormShiftPickerRowProps,
     ref: ForwardedRef<any>,
   ) => {
-    const seniorityRef: MutableRefObject<unknown> = useRef(null);
-    const shiftRef: MutableRefObject<unknown> = useRef(null);
+    const seniorityRef: RefObject<unknown> = useRef(null);
+    const shiftRef: RefObject<unknown> = useRef(null);
 
     useImperativeHandle(ref, () => {
       return {
@@ -200,7 +200,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
     ref: ForwardedRef<any>,
   ) => {
     const [useIDCode, setUseIDCode] = useState<boolean>(true);
-    const idCodeCheckboxRef: MutableRefObject<null> = useRef(null);
+    const idCodeCheckboxRef: RefObject<null> = useRef(null);
 
     const isVisible: boolean = entryId < childCount;
 
@@ -330,7 +330,7 @@ const RegistrationForm = () => {
   const [seniorityStatuses, setSeniorityStatuses] = useState<boolean[]>([]);
   const [shifts, setShifts] = useState<number[]>([]);
 
-  const childrenRef: MutableRefObject<unknown> = useRef(null);
+  const childrenRef: RefObject<unknown> = useRef(null);
   useEffect(() => {
     const initialSeniorityStatuses: boolean[] = [];
     const initialShifts: number[] = [];

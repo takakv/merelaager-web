@@ -1,7 +1,7 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import type { ReactElement } from "react";
 import { Fragment } from "react";
-import type { MetaDescriptor, MetaFunction } from "@remix-run/node";
+import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";

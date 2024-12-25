@@ -1,8 +1,7 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "react-router";
 import type { ReactElement } from "react";
 import { Fragment } from "react";
-import type { MetaDescriptor, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import Email from "~/components/email";
 import { InfoBanner, WarningBanner } from "~/components/banners";
@@ -283,7 +282,7 @@ export const loader = async () => {
     }
   });
 
-  return json({ dbShifts });
+  return { dbShifts };
 };
 
 const ShiftDatesSection = () => {

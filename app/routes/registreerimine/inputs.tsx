@@ -1,6 +1,6 @@
 import type { ChangeEvent, ForwardedRef, ForwardRefExoticComponent, RefAttributes } from "react";
 import React, { forwardRef } from "react";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 export interface IUpdateShifts {
   updateShifts: (entryId: number, shift: string) => void;

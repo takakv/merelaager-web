@@ -1,6 +1,6 @@
-import type { LinksFunction, MetaDescriptor, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import type { LinksFunction, MetaDescriptor, MetaFunction } from "react-router";
+//import { json } from "node";
+import { Link, useLoaderData } from "react-router";
 import type { ReactElement } from "react";
 import React, { Fragment, useState, useRef, createRef, RefObject } from "react";
 
@@ -182,7 +182,7 @@ export const loader = async () => {
   const tagline = dbTagline ? dbTagline.value : null;
   const subtext = dbSubtext ? dbSubtext.value : null;
 
-  return json({ tagline, subtext });
+  return { tagline, subtext };
 };
 
 const Hero = () => {

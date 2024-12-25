@@ -9,14 +9,14 @@ public/*
 *.css
 *.css.map
 
-# Build
-/.cache
-/build
-/public/build
+# React Router
+/.react-router/
+/build/
 
-# DEVenv
+# devenv
 .idea/
 .DS_Store
+/node_modules/
 
 # Yarn stuff
 .pnp.*
@@ -26,5 +26,3 @@ public/*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
-node_modules/*

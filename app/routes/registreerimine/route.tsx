@@ -1,11 +1,10 @@
 import {
   ActionFunctionArgs,
-  json,
   MetaDescriptor,
   MetaFunction,
   redirect,
-} from "@remix-run/node";
-import { Link, useActionData, useLoaderData } from "@remix-run/react";
+} from "react-router";
+import { Link, useActionData, useLoaderData } from "react-router";
 
 import { prisma } from "~/db.server";
 
@@ -64,10 +63,10 @@ export const loader = async () => {
     remainingSlots[registration.shiftNr][registration.children.gender] -= 1;
   });
 
-  return json({
+  return {
     shifts,
     remainingSlots,
-  });
+  };
 };
 
 const RefsSection = () => {
@@ -154,7 +153,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return redirect("/registreerimine/edu");
   }
 
-  return json(response);
+  return response;
 };
 
 export default function RegistrationRoute() {

@@ -1,4 +1,4 @@
-import type { MetaDescriptor, MetaFunction } from "@remix-run/node";
+import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
