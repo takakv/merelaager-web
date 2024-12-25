@@ -1,6 +1,7 @@
 import compression from "compression";
 import express from "express";
 import slashes from "connect-slashes";
+import "dotenv/config"
 
 // Short-circuit the type-checking of the built output.
 const BUILD_PATH = "./build/server/index.js";

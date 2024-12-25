@@ -1862,6 +1862,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv@npm:^16.4.7":
+  version: 16.4.7
+  resolution: "dotenv@npm:16.4.7"
+  checksum: 10c0/be9f597e36a8daf834452daa1f4cc30e5375a5968f98f46d89b16b983c567398a330580c88395069a77473943c06b877d1ca25b4afafcdd6d4adb549e8293462
+  languageName: node
+  linkType: hard
+
 "dunder-proto@npm:^1.0.0":
   version: 1.0.1
   resolution: "dunder-proto@npm:1.0.1"
@@ -2789,6 +2796,7 @@ __metadata:
     compression: "npm:^1.7.5"
     connect-slashes: "npm:^1.4.0"
     cross-env: "npm:^7.0.3"
+    dotenv: "npm:^16.4.7"
     express: "npm:^4.21.2"
     isbot: "npm:^5.1.18"
     prisma: "npm:^6.1.0"
