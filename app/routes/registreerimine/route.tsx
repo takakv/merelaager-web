@@ -14,8 +14,8 @@ import MetaConstants from "~/utils/meta-constants";
 
 import Email from "~/components/email";
 
-import { RegistrationSection } from "~/routes/_app.registreerimine/registration";
-import { formAction } from "~/routes/_app.registreerimine/action";
+import { RegistrationSection } from "~/routes/registreerimine/registration";
+import { formAction } from "~/routes/registreerimine/action";
 import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {

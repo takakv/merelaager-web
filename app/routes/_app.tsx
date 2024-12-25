@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Outlet } from "@remix-run/react";
+import { Outlet } from "react-router";
 
 import NavBar from "~/components/nav-bar";
 import Sponsors from "~/components/sponsors";

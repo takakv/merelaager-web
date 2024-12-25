@@ -16,7 +16,7 @@ import { InfoBanner, WarningBanner } from "~/components/banners";
 import type {
   IUpdateSeniority,
   IUpdateShifts,
-} from "~/routes/_app.registreerimine/inputs";
+} from "~/routes/registreerimine/inputs";
 import {
   AddendumInput,
   CityInput,
@@ -36,7 +36,7 @@ import {
   ShirtInput,
   TermsAcknowledgeInput,
   UseIDCodeInput,
-} from "~/routes/_app.registreerimine/inputs";
+} from "~/routes/registreerimine/inputs";
 
 interface ChildFormEntryProps {
   entryId: number;
