@@ -30,7 +30,7 @@ const InfoCard = (props: ShiftInfo) => {
 
   const dateOptions: Intl.DateTimeFormatOptions = {
     month: "2-digit",
-    day: "2-digit"
+    day: "2-digit",
   };
 
   const startDateStr = props.shiftStartDate.toLocaleDateString(
@@ -103,7 +103,7 @@ interface CalendarMonthProps {
 const CalendarMonth = ({ monthIndex, activeDays }: CalendarMonthProps) => {
   const monthDate = new Date(YEAR, monthIndex + 1, 0);
   const monthName = monthDate.toLocaleDateString("et", {
-    month: "long"
+    month: "long",
   });
 
   const daysInMonth = monthDate.getDate();
@@ -179,7 +179,7 @@ const CalendarsComponent = ({ shifts }: ShiftInfoProps) => {
     if (activeSpans.some((el) => el.monthIndex === shiftMonthIndex)) return;
     activeSpans.push({
       monthIndex: shiftMonthIndex,
-      activeDays: []
+      activeDays: [],
     });
   });
 
@@ -201,7 +201,7 @@ const CalendarsComponent = ({ shifts }: ShiftInfoProps) => {
         startDay: 1,
         endDay: spanDaysRemaining,
         isLight: spanIsLight,
-        isTrueStart: false
+        isTrueStart: false,
       });
       spanDaysRemaining = 0;
       // Switch the colours for the next shift.
@@ -221,7 +221,7 @@ const CalendarsComponent = ({ shifts }: ShiftInfoProps) => {
       startDay,
       endDay,
       isLight: spanIsLight,
-      isTrueStart: true
+      isTrueStart: true,
     });
 
     // Do not switch the colours yet, if there is an overflow into the next shift.
@@ -278,8 +278,8 @@ export const loader = async () => {
       length: true,
       bossName: true,
       bossEmail: true,
-      bossPhone: true
-    }
+      bossPhone: true,
+    },
   });
 
   return { dbShifts };
@@ -296,7 +296,7 @@ const ShiftDatesSection = () => {
       username: shift.bossEmail.split("@")[0],
       phone: shift.bossPhone,
       shiftLen: shift.length,
-      shiftStartDate: new Date(shift.startDate)
+      shiftStartDate: new Date(shift.startDate),
     });
   });
 
@@ -307,11 +307,9 @@ const ShiftDatesSection = () => {
       <div className="o-container">
         <h3 className="c-section-heading">{shiftYear} Laagrivahetuste ajad</h3>
         <WarningBanner>
-          Tähelepanu!
-          Kuvatud kuupäevad on merelaagri 2025 <strong>prognoositud</strong> kuupäevad.
-          Kuupäevad võivad erakorraliste põhjuste tõttu muutuda 10.01.2025.
-          Seetõttu algab registreerimine 12.01.2025 kell 14.00.
-          Rohkem infot peagi.
+          Tähelepanu! Merelaagri 2025. aasta kuupäevad on esialgsed ja võivad
+          10. jaanuaril erakorraliste põhjuste tõttu muutuda. Seetõttu algab
+          registreerimine 12. jaanuaril 2025 kell 14.00. Rohkem infot peagi.
         </WarningBanner>
         <CalendarsComponent shifts={shifts} />
         <ShiftInfoComponent shifts={shifts} />
