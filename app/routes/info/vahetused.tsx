@@ -1,7 +1,7 @@
+import type { MetaDescriptor, MetaFunction } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import type { ReactElement } from "react";
 import { Fragment } from "react";
-import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import Email from "~/components/email";
 import { InfoBanner, WarningBanner } from "~/components/banners";
@@ -101,16 +101,20 @@ interface CalendarMonthProps {
 }
 
 const CalendarMonth = ({ monthIndex, activeDays }: CalendarMonthProps) => {
-  const monthDate = new Date(YEAR, monthIndex + 1, 0);
+  const monthDate = new Date(YEAR, monthIndex, 1);
   const monthName = monthDate.toLocaleDateString("et", {
     month: "long",
   });
 
-  const daysInMonth = monthDate.getDate();
-  monthDate.setDate(monthDate.getDate() - daysInMonth + 1);
-  // Get the weekday index of the first day in the month. Subtract one to get
-  // the difference of days with "Monday", when the calendar starts.
-  const underflowDays = monthDate.getDay() - 1;
+  // Get the number of days in a month.
+  const daysInMonth = new Date(YEAR, monthIndex + 1, 0).getDate();
+
+  // Get the weekday index of the first day in the month.
+  const firstDayOfMonth = monthDate.getDay();
+  // If the first day of the week is a Sunday, pad with 6 empty slots.
+  // Otherwise, pad with the number of slots for the index of the day of the
+  // week.
+  const underflowDays = (firstDayOfMonth || 7) - 1;
 
   const underflowDayEls: ReactElement[] = [];
   for (let i = 0; i < underflowDays; ++i) {
@@ -171,70 +175,66 @@ interface ShiftInfoProps {
 }
 
 const CalendarsComponent = ({ shifts }: ShiftInfoProps) => {
-  const activeSpans: CalendarMonthProps[] = [];
+  // TODO: improve the logic.
+  const activeMonths: { [property: string]: ActiveDay[] } = {};
+  for (const [i, shift] of shifts.entries()) {
+    const isLight = i % 2 === 0;
+    const shiftStartDate = shift.shiftStartDate;
+    const shiftEndDate = new Date(
+      shiftStartDate.getFullYear(),
+      shiftStartDate.getMonth(),
+      shiftStartDate.getDate() + shift.shiftLen
+    );
 
-  // Get the months for every active shift.
-  shifts.forEach((shift) => {
-    const shiftMonthIndex = shift.shiftStartDate.getMonth();
-    if (activeSpans.some((el) => el.monthIndex === shiftMonthIndex)) return;
-    activeSpans.push({
-      monthIndex: shiftMonthIndex,
-      activeDays: [],
-    });
-  });
+    const shiftStartMonth = shiftStartDate.getMonth();
+    const shiftEndMonth = shiftEndDate.getMonth();
 
-  let spanIsLight = true;
-  let spanDaysRemaining = 0;
+    if (!(shiftStartMonth in activeMonths)) {
+      activeMonths[shiftStartMonth] = [];
+    }
 
-  shifts.forEach((shift) => {
-    const month = shift.shiftStartDate.getMonth();
-    const startDay = shift.shiftStartDate.getDate();
-    const daysInMonth = new Date(YEAR, month + 1, 0).getDate();
+    let endDay = shiftEndDate.getDate() - 1;
 
-    const arrayIndex = activeSpans.findIndex((el) => el.monthIndex === month);
+    // If the shift spans two months, mark all the remaining days of
+    // the month as active, and carry over the rest to the next month.
+    if (shiftStartDate.getUTCMonth() !== shiftEndDate.getUTCMonth()) {
+      if (!(shiftEndMonth in activeMonths)) {
+        activeMonths[shiftEndMonth] = [];
+      }
 
-    // Deal with the days that overflowed from the past month.
-    // The first day of the month is not the true shift start,
-    // so make not of it, to avoid marking it as a shift start.
-    if (spanDaysRemaining !== 0) {
-      activeSpans[arrayIndex].activeDays.push({
+      // The cary starts from the first day of the second month.
+      activeMonths[shiftEndMonth].push({
         startDay: 1,
-        endDay: spanDaysRemaining,
-        isLight: spanIsLight,
+        endDay: endDay,
+        isLight: isLight,
         isTrueStart: false,
       });
-      spanDaysRemaining = 0;
-      // Switch the colours for the next shift.
-      spanIsLight = !spanIsLight;
+
+      // The end day for the first month is the last day of the month.
+      endDay = new Date(
+        shiftStartDate.getFullYear(),
+        shiftStartDate.getMonth() + 1,
+        0
+      ).getDate();
     }
 
-    let switchColours = true;
-
-    let endDay = startDay + shift.shiftLen - 1;
-    if (endDay > daysInMonth) {
-      spanDaysRemaining = endDay - daysInMonth;
-      endDay = daysInMonth;
-      switchColours = false;
-    }
-
-    activeSpans[arrayIndex].activeDays.push({
-      startDay,
-      endDay,
-      isLight: spanIsLight,
+    activeMonths[shiftStartMonth].push({
+      startDay: shiftStartDate.getDate(),
+      endDay: endDay,
+      isLight: isLight,
       isTrueStart: true,
     });
+  }
 
-    // Do not switch the colours yet, if there is an overflow into the next shift.
-    if (switchColours) spanIsLight = !spanIsLight;
-  });
-
-  const calendarMonths = activeSpans.map((el) => (
-    <CalendarMonth
-      key={el.monthIndex}
-      monthIndex={el.monthIndex}
-      activeDays={el.activeDays}
-    />
-  ));
+  const calendarMonths = Object.keys(activeMonths)
+    .sort()
+    .map((el) => (
+      <CalendarMonth
+        key={el}
+        monthIndex={parseInt(el, 10)}
+        activeDays={activeMonths[el]}
+      />
+    ));
 
   return (
     <Fragment>
