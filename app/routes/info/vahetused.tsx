@@ -16,9 +16,9 @@ import { getShiftDateSpan, ShiftDateInfo } from "~/utils/shift-dates";
 
 interface ShiftInfo extends ShiftDateInfo {
   shiftNr: number;
-  name: string;
-  username: string;
-  phone: string;
+  bossName: string;
+  bossUsername: string;
+  bossPhone: string;
 }
 
 export const meta: MetaFunction = () => {
@@ -28,25 +28,30 @@ export const meta: MetaFunction = () => {
   ) as MetaDescriptor[];
 };
 
-const InfoCard = (props: ShiftInfo) => {
+interface InfoCardProps {
+  shiftInfo: ShiftInfo;
+}
+
+const InfoCard = ({ shiftInfo }: InfoCardProps) => {
   const numerals = ["I", "II", "III", "IV", "V"];
 
   return (
     <div className="c-shift-card">
       <div className="c-details__header">
-        {numerals[props.shiftNr - 1]} vahetus<span className="u-wave"></span>
-        {getShiftDateSpan(props)}
-        <span className="u-wave"></span>
-        {props.length} päeva
+        {numerals[shiftInfo.shiftNr - 1]} vahetus
+        <span className="u-wave" />
+        {getShiftDateSpan(shiftInfo)}
+        <span className="u-wave" />
+        {shiftInfo.length} päeva
       </div>
       <div className="details-contact">
         <p>
-          <b>{props.name}</b>
+          <b>{shiftInfo.bossName}</b>
         </p>
         <p>
-          <Email username={props.username} />
+          <Email username={shiftInfo.bossUsername} />
         </p>
-        <p>{props.phone}</p>
+        <p>{shiftInfo.bossPhone}</p>
       </div>
       {/*<div class="contact__free"><div class="count">-</div></div>*/}
     </div>
@@ -59,15 +64,7 @@ interface ShiftInfoProps {
 
 const ShiftInfoComponent = ({ shifts }: ShiftInfoProps) => {
   const infoCards = shifts.map((shift) => (
-    <InfoCard
-      key={shift.shiftNr}
-      shiftNr={shift.shiftNr}
-      name={shift.name}
-      username={shift.username}
-      phone={shift.phone}
-      length={shift.length}
-      startDate={shift.startDate}
-    />
+    <InfoCard key={shift.shiftNr} shiftInfo={shift} />
   ));
   return (
     <Fragment>
@@ -80,12 +77,12 @@ const ShiftInfoComponent = ({ shifts }: ShiftInfoProps) => {
   );
 };
 
-interface ActiveDay {
+type ActiveDay = {
   startDay: number;
   endDay: number;
   isLight: boolean;
   isTrueStart: boolean;
-}
+};
 
 interface CalendarMonthProps {
   monthIndex: number;
@@ -284,9 +281,9 @@ const ShiftDatesSection = () => {
   dbShifts.forEach((shift) => {
     shifts.push({
       shiftNr: shift.id,
-      name: shift.bossName,
-      username: shift.bossEmail.split("@")[0],
-      phone: shift.bossPhone,
+      bossName: shift.bossName,
+      bossUsername: shift.bossEmail.split("@")[0],
+      bossPhone: shift.bossPhone,
       length: shift.length,
       startDate: shift.startDate,
     });
