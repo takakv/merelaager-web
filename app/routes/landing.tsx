@@ -1,6 +1,5 @@
 import type { LinksFunction, MetaDescriptor, MetaFunction } from "react-router";
 import { Link, useLoaderData } from "react-router";
-import type { ReactElement } from "react";
 import React, { Fragment, useState, useRef, createRef, RefObject } from "react";
 
 import Sponsors from "~/components/sponsors";
@@ -9,8 +8,13 @@ import NavBar from "~/components/nav-bar";
 import MetaConstants from "~/utils/meta-constants";
 import { genMetaData } from "~/utils/metagen";
 
-import type { QuickLink } from "~/hcdb";
-import { LANDING_SUBTEXT, LANDING_TAGLINE, landingQuickLinks, YEAR } from "~/hcdb";
+import { landingPromoContent, QuickLink } from "~/hcdb";
+import {
+  LANDING_SUBTEXT,
+  LANDING_TAGLINE,
+  landingQuickLinks,
+  YEAR,
+} from "~/hcdb";
 import Footer from "~/components/footer";
 import { prisma } from "~/db.server";
 
@@ -21,40 +25,8 @@ export const meta: MetaFunction = () => {
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
-  }
-];
-
-interface PromoContent {
-  title: string;
-  description: string;
-  img?: ReactElement;
-  video_mp4?: string;
-  video_webm?: string;
-}
-
-const promoContent: PromoContent[] = [
-  {
-    title: "Laoküla merelaager",
-    description:
-      "Suurepärane võimalus 8–16aastastel merehuvilistel veeta suvi looduskaunis kohas mere kaldal.",
-    video_webm: "/img/landing/introduction.webm",
-    video_mp4: "/img/landing/introduction.mp4"
+    href: "https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap",
   },
-  {
-    title: "Eelnev merekogemus pole oluline",
-    description:
-      "12päevase laagrivahetuse jooksul võib selgeks saada nii purjetamise, sõudmise kui ka muude meresõiduvahendite kasutamise algtõed.",
-    video_webm: "/img/landing/sailing.webm",
-    video_mp4: "/img/landing/sailing.mp4"
-  },
-  {
-    title: "Ja siis, kui merele ei saa",
-    description:
-      "Merelaagri õhtuid ja ka tormipäevi sisustavad tavapärased laagri tegevused – lõkkeõhtud, diskod, matkad ja mitmesugused võistlused.",
-    video_webm: "/img/landing/freetime.webm",
-    video_mp4: "/img/landing/freetime.mp4"
-  }
 ];
 
 const CTASection = () => {
@@ -85,16 +57,17 @@ const CTASection = () => {
 };
 
 const PromoSectionCards = () => {
-  const [videoProgress, setVideoProgress] = useState(Array(promoContent.length).fill(0));
-  const vidRef = useRef(promoContent.map(() => createRef()));
+  const [videoProgress, setVideoProgress] = useState(
+    Array(landingPromoContent.length).fill(0)
+  );
+  const vidRef = useRef(landingPromoContent.map(() => createRef()));
 
   const setProgress = (idx: number, e: React.SyntheticEvent) => {
     let video = e.target as HTMLVideoElement;
-    if (isNaN(video.duration))
-      return;
+    if (isNaN(video.duration)) return;
     if (video) {
       const progress = (video.currentTime / video.duration) * 100;
-      setVideoProgress(prevProgress => {
+      setVideoProgress((prevProgress) => {
         const newProgress = [...prevProgress];
         newProgress[idx] = progress;
         return newProgress;
@@ -108,24 +81,30 @@ const PromoSectionCards = () => {
     else video.pause();
   };
 
-  const promoSections = promoContent.map((content, idx) => {
+  const promoSections = landingPromoContent.map((content, idx) => {
     let classes = "c-home-block";
     if ((idx & 0x01) !== 1) classes += ` ${classes}--inverted`;
     return (
       <div key={idx} className={classes}>
         <div className="c-home-block-media">
-        <video
-          ref={vidRef.current[idx] as RefObject<HTMLVideoElement>}
-          autoPlay
-          loop
-          muted
-          playsInline
-          onTimeUpdate={(e) => setProgress(idx, e)}
-          onClick={() => playPauseVideo(idx)}>
-          <source src={content.video_mp4} type="video/mp4"></source>
-          <source src={content.video_webm} type="video/webm"></source>
-        </video>
-        <progress className="progressbar" id={`progress_${idx}`} max="100" value={videoProgress[idx]}/>
+          <video
+            ref={vidRef.current[idx] as RefObject<HTMLVideoElement>}
+            autoPlay
+            loop
+            muted
+            playsInline
+            onTimeUpdate={(e) => setProgress(idx, e)}
+            onClick={() => playPauseVideo(idx)}
+          >
+            <source src={content.video_mp4} type="video/mp4"></source>
+            <source src={content.video_webm} type="video/webm"></source>
+          </video>
+          <progress
+            className="progressbar"
+            id={`progress_${idx}`}
+            max="100"
+            value={videoProgress[idx]}
+          />
         </div>
         <div className="c-home-block-body">
           <h3>{content.title}</h3>
@@ -172,14 +151,14 @@ const PromoSection = () => {
 
 export const loader = async () => {
   const dbTagline = await prisma.generalInfo.findUnique({
-    where: { key: "tagline" }
+    where: { key: "tagline" },
   });
   const dbSubtext = await prisma.generalInfo.findUnique({
-    where: { key: "subtext" }
+    where: { key: "subtext" },
   });
 
-  const tagline = dbTagline ? dbTagline.value : null;
-  const subtext = dbSubtext ? dbSubtext.value : null;
+  const tagline = dbTagline ? dbTagline.value : LANDING_TAGLINE;
+  const subtext = dbSubtext ? dbSubtext.value : LANDING_SUBTEXT;
 
   return { tagline, subtext };
 };
@@ -197,8 +176,8 @@ const Hero = () => {
     <section className="c-landing-hero c-section">
       <NavBar inverted={true} />
       <div className="c-landing-hero__content">
-        <h1 className="">{tagline ?? LANDING_TAGLINE}</h1>
-        <h2 className="">{subtext ?? LANDING_SUBTEXT}</h2>
+        <h1 className="">{tagline}</h1>
+        <h2 className="">{subtext}</h2>
         <ul className="c-landing-quickies">{quickLinks}</ul>
       </div>
       <img

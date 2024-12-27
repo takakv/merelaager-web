@@ -1,8 +1,7 @@
-// This file contains the "static database". Information is hardcoded here to
-// avoid unnecessary server requests. In practice, only a small subset of this
-// information ever changes, and this infrequently, so currently it is not too
-// inconvenient to update this information manually when needed, and hence
-// completely avoid database interactions for this application.
+// This file contains the ‘static database’. Information is hardcoded here
+// since it rarely changes, and it is hardly inconvenient to redeploy the
+// application when this information changes. Additionally, it helps keep a nice
+// history of some key info on the website.
 
 // The used year reflects the relevant information year, which might not be the
 // current year. Hence, using new Date().getFullYear() is not suitable everywhere.
@@ -10,6 +9,8 @@
 // to "toggle" the year swap. As such, this constant should be used wherever the
 // information year is needed (i.e., everywhere aside from immutable, static years
 // or copyright).
+
+import type { ReactElement } from "react";
 
 export const YEAR: number = 2025;
 
@@ -42,6 +43,38 @@ export const landingQuickLinks: QuickLink[] = [
     href: "/info/maksmine/#maksumus",
     content: "Hinnad"
   }*/
+];
+
+export interface PromoContent {
+  title: string;
+  description: string;
+  img?: ReactElement;
+  video_mp4?: string;
+  video_webm?: string;
+}
+
+export const landingPromoContent: PromoContent[] = [
+  {
+    title: "Laoküla merelaager",
+    description:
+      "Suurepärane võimalus 8–16aastastel merehuvilistel veeta suvi looduskaunis kohas mere kaldal.",
+    video_webm: "/img/landing/introduction.webm",
+    video_mp4: "/img/landing/introduction.mp4",
+  },
+  {
+    title: "Eelnev merekogemus pole oluline",
+    description:
+      "12päevase laagrivahetuse jooksul võib selgeks saada nii purjetamise, sõudmise kui ka muude meresõiduvahendite kasutamise algtõed.",
+    video_webm: "/img/landing/sailing.webm",
+    video_mp4: "/img/landing/sailing.mp4",
+  },
+  {
+    title: "Ja siis, kui merele ei saa",
+    description:
+      "Merelaagri õhtuid ja ka tormipäevi sisustavad tavapärased laagri tegevused – lõkkeõhtud, diskod, matkad ja mitmesugused võistlused.",
+    video_webm: "/img/landing/freetime.webm",
+    video_mp4: "/img/landing/freetime.mp4",
+  },
 ];
 
 export interface TeamMember {
