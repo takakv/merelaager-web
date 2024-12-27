@@ -1,6 +1,13 @@
-import type { ChangeEvent, ForwardedRef, ForwardRefExoticComponent, RefAttributes } from "react";
+import type {
+  ChangeEvent,
+  ForwardedRef,
+  ForwardRefExoticComponent,
+  RefAttributes,
+} from "react";
 import React, { forwardRef } from "react";
-import { Link } from "react-router";
+import { Link, useLoaderData } from "react-router";
+import { loader } from "~/routes/registreerimine/route";
+import { ShiftDateSpans } from "~/utils/shift-dates";
 
 export interface IUpdateShifts {
   updateShifts: (entryId: number, shift: string) => void;
@@ -27,7 +34,7 @@ const counties: string[] = [
   "Valga",
   "Põlva",
   "Lääne",
-  "Hiiu"
+  "Hiiu",
 ].map((county: string): string => county + "maa");
 
 export const NameInput = ({ entryId, isRequired }: FormInputProps) => {
@@ -48,10 +55,10 @@ export const NameInput = ({ entryId, isRequired }: FormInputProps) => {
 };
 
 export const IDCodeInput = ({
-                              entryId,
-                              isRequired,
-                              isHidden
-                            }: FormInputProps) => {
+  entryId,
+  isRequired,
+  isHidden,
+}: FormInputProps) => {
   return (
     <div
       className={"registration-form__field" + (isHidden ? " is-hidden" : "")}
@@ -147,20 +154,30 @@ export const UseIDCodeInput: ForwardRefExoticComponent<
 );
 
 interface ShiftInputProps extends FormInputProps, IUpdateShifts {
+  shiftDateSpans: ShiftDateSpans;
 }
 
 export const ShiftInput: ForwardRefExoticComponent<
   ShiftInputProps & RefAttributes<any>
-> = forwardRef(({
-                  entryId,
-                  isRequired,
-                  updateShifts
-                }: ShiftInputProps,
-                ref: ForwardedRef<any>) => {
+> = forwardRef(
+  (
+    { entryId, isRequired, shiftDateSpans, updateShifts }: ShiftInputProps,
+    ref: ForwardedRef<any>
+  ) => {
     const handleSelection = ({ target }: ChangeEvent) => {
       const value: string = (target as HTMLSelectElement).value;
       updateShifts(entryId, value);
     };
+
+    const options = [];
+    for (const [i, span] of shiftDateSpans.entries()) {
+      const id = i + 1;
+      options.push(
+        <option value={id} key={id}>
+          {id}. vahetus ({span})
+        </option>
+      );
+    }
 
     return (
       <div className="registration-form__field">
@@ -176,10 +193,7 @@ export const ShiftInput: ForwardRefExoticComponent<
           ref={ref}
         >
           <option value="">--Valige vahetus--</option>
-          <option value="1">1. vahetus (25.06–05.07)</option>
-          <option value="2">2. vahetus (08.07–19.07)</option>
-          <option value="3">3. vahetus (22.07–02.08)</option>
-          <option value="4">4. vahetus (05.08–16.08)</option>
+          {options.map((option) => option)}
         </select>
       </div>
     );
@@ -215,8 +229,7 @@ export interface IUpdateSeniority {
   updateSeniority: (entryId: number, isSenior: boolean) => void;
 }
 
-interface SeniorityInputProps extends FormInputProps, IUpdateSeniority {
-}
+interface SeniorityInputProps extends FormInputProps, IUpdateSeniority {}
 
 export const SeniorityInput: ForwardRefExoticComponent<
   SeniorityInputProps & RefAttributes<any>

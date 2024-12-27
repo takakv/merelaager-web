@@ -11,8 +11,15 @@ import MetaConstants from "~/utils/meta-constants";
 
 import { prisma } from "~/db.server";
 
-import type { ShiftInfo } from "~/hcdb";
 import { YEAR } from "~/hcdb";
+import { getShiftDateSpan, ShiftDateInfo } from "~/utils/shift-dates";
+
+interface ShiftInfo extends ShiftDateInfo {
+  shiftNr: number;
+  name: string;
+  username: string;
+  phone: string;
+}
 
 export const meta: MetaFunction = () => {
   return genMetaData(
@@ -24,28 +31,13 @@ export const meta: MetaFunction = () => {
 const InfoCard = (props: ShiftInfo) => {
   const numerals = ["I", "II", "III", "IV", "V"];
 
-  const endDate = new Date(props.shiftStartDate);
-  // Subtract one to avoid overflowing into an extra day.
-  endDate.setDate(endDate.getDate() + props.shiftLen - 1);
-
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    month: "2-digit",
-    day: "2-digit",
-  };
-
-  const startDateStr = props.shiftStartDate.toLocaleDateString(
-    "et",
-    dateOptions
-  );
-  const endDateStr = endDate.toLocaleDateString("et", dateOptions);
-
   return (
     <div className="c-shift-card">
       <div className="c-details__header">
         {numerals[props.shiftNr - 1]} vahetus<span className="u-wave"></span>
-        {startDateStr}-{endDateStr}
+        {getShiftDateSpan(props)}
         <span className="u-wave"></span>
-        {props.shiftLen} päeva
+        {props.length} päeva
       </div>
       <div className="details-contact">
         <p>
@@ -73,8 +65,8 @@ const ShiftInfoComponent = ({ shifts }: ShiftInfoProps) => {
       name={shift.name}
       username={shift.username}
       phone={shift.phone}
-      shiftLen={shift.shiftLen}
-      shiftStartDate={shift.shiftStartDate}
+      length={shift.length}
+      startDate={shift.startDate}
     />
   ));
   return (
@@ -179,11 +171,11 @@ const CalendarsComponent = ({ shifts }: ShiftInfoProps) => {
   const activeMonths: { [property: string]: ActiveDay[] } = {};
   for (const [i, shift] of shifts.entries()) {
     const isLight = i % 2 === 0;
-    const shiftStartDate = shift.shiftStartDate;
+    const shiftStartDate = shift.startDate;
     const shiftEndDate = new Date(
       shiftStartDate.getFullYear(),
       shiftStartDate.getMonth(),
-      shiftStartDate.getDate() + shift.shiftLen
+      shiftStartDate.getDate() + shift.length
     );
 
     const shiftStartMonth = shiftStartDate.getMonth();
@@ -295,12 +287,12 @@ const ShiftDatesSection = () => {
       name: shift.bossName,
       username: shift.bossEmail.split("@")[0],
       phone: shift.bossPhone,
-      shiftLen: shift.length,
-      shiftStartDate: new Date(shift.startDate),
+      length: shift.length,
+      startDate: shift.startDate,
     });
   });
 
-  const shiftYear = shifts[0].shiftStartDate.getUTCFullYear();
+  const shiftYear = shifts[0].startDate.getUTCFullYear();
 
   return (
     <section className="c-section" id="ajad">

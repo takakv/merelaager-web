@@ -1,14 +1,15 @@
-import { Form } from "react-router";
+import { Form, useLoaderData } from "react-router";
 import React, {
-    ForwardedRef,
-    forwardRef,
-    ForwardRefExoticComponent, JSX,
-    RefAttributes,
-    RefObject,
-    useEffect,
-    useImperativeHandle,
-    useRef,
-    useState,
+  ForwardedRef,
+  forwardRef,
+  ForwardRefExoticComponent,
+  JSX,
+  RefAttributes,
+  RefObject,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
 } from "react";
 
 import { InfoBanner, WarningBanner } from "~/components/banners";
@@ -37,6 +38,8 @@ import {
   TermsAcknowledgeInput,
   UseIDCodeInput,
 } from "~/routes/registreerimine/inputs";
+import { loader } from "~/routes/registreerimine/route";
+import { getShiftDateSpans, ShiftDateSpans } from "~/utils/shift-dates";
 
 interface ChildFormEntryProps {
   entryId: number;
@@ -83,7 +86,7 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
 > = forwardRef(
   (
     { entryId, setUseIDCode }: FormUseIDCodeRowProps,
-    ref: ForwardedRef<any>,
+    ref: ForwardedRef<any>
   ) => {
     return (
       <div className="registration-form__row registration-form__row--minor">
@@ -94,13 +97,15 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
         />
       </div>
     );
-  },
+  }
 );
 
 interface FormShiftPickerRowProps
   extends ChildFormEntryProps,
     IUpdateSeniority,
-    IUpdateShifts {}
+    IUpdateShifts {
+  shiftDateSpans: ShiftDateSpans;
+}
 
 const FormShiftPickerRow: ForwardRefExoticComponent<
   FormShiftPickerRowProps & RefAttributes<any>
@@ -109,10 +114,11 @@ const FormShiftPickerRow: ForwardRefExoticComponent<
     {
       entryId,
       required,
+      shiftDateSpans,
       updateSeniority,
       updateShifts,
     }: FormShiftPickerRowProps,
-    ref: ForwardedRef<any>,
+    ref: ForwardedRef<any>
   ) => {
     const seniorityRef: RefObject<unknown> = useRef(null);
     const shiftRef: RefObject<unknown> = useRef(null);
@@ -129,6 +135,7 @@ const FormShiftPickerRow: ForwardRefExoticComponent<
         <ShiftInput
           entryId={entryId}
           isRequired={required}
+          shiftDateSpans={shiftDateSpans}
           updateShifts={updateShifts}
           ref={shiftRef}
         />
@@ -141,7 +148,7 @@ const FormShiftPickerRow: ForwardRefExoticComponent<
         />
       </div>
     );
-  },
+  }
 );
 
 const FormAddressRow = ({ entryId, required }: ChildFormEntryProps) => {
@@ -183,6 +190,7 @@ const RemoveChildButton = ({
 interface ChildFormProps extends IUpdateSeniority, IUpdateShifts {
   entryId: number;
   childCount: number;
+  shiftDateSpans: ShiftDateSpans;
   removeChildCard: () => void;
 }
 
@@ -193,11 +201,12 @@ const ChildFormEntry: ForwardRefExoticComponent<
     {
       entryId,
       childCount,
+      shiftDateSpans,
       removeChildCard,
       updateSeniority,
       updateShifts,
     }: ChildFormProps,
-    ref: ForwardedRef<any>,
+    ref: ForwardedRef<any>
   ) => {
     const [useIDCode, setUseIDCode] = useState<boolean>(true);
     const idCodeCheckboxRef: RefObject<null> = useRef(null);
@@ -232,6 +241,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
         <FormShiftPickerRow
           entryId={entryId}
           required={isVisible}
+          shiftDateSpans={shiftDateSpans}
           updateSeniority={updateSeniority}
           updateShifts={updateShifts}
           ref={ref}
@@ -241,7 +251,7 @@ const ChildFormEntry: ForwardRefExoticComponent<
         <FormAddendumRow entryId={entryId} required={isVisible} />
       </div>
     );
-  },
+  }
 );
 
 const ParentFormEntry = () => {
@@ -319,6 +329,9 @@ const RegistrationSubmitButton = () => {
 };
 
 const RegistrationForm = () => {
+  const { shifts } = useLoaderData<typeof loader>();
+  const shiftDateSpans = getShiftDateSpans(shifts);
+
   const maxChildCount = 4;
   const upfrontRegistrationFee = 100;
   const shiftFullPrice = 240;
@@ -328,7 +341,7 @@ const RegistrationForm = () => {
   const [childCount, setChildCount] = useState<number>(1);
   const [canAddMoreChildren, setCanAddMoreChildren] = useState<boolean>(true);
   const [seniorityStatuses, setSeniorityStatuses] = useState<boolean[]>([]);
-  const [shifts, setShifts] = useState<number[]>([]);
+  const [selectedShifts, setSelectedShifts] = useState<number[]>([]);
 
   const childrenRef: RefObject<unknown> = useRef(null);
   useEffect(() => {
@@ -341,13 +354,13 @@ const RegistrationForm = () => {
     });
 
     setSeniorityStatuses(initialSeniorityStatuses);
-    setShifts(initialShifts);
+    setSelectedShifts(initialShifts);
   }, []);
 
   const getUpdatedPrice = (): number => {
     let totalShiftPrice: number = childCount * shiftFullPrice;
     for (let i = 0; i < childCount; ++i) {
-      if (shifts[i] === 1) totalShiftPrice -= shortDiscount;
+      if (selectedShifts[i] === 1) totalShiftPrice -= shortDiscount;
       if (seniorityStatuses[i]) totalShiftPrice -= seniorityDiscount;
     }
     return totalShiftPrice;
@@ -358,19 +371,19 @@ const RegistrationForm = () => {
       (status: boolean, idx: number): boolean => {
         if (idx === entryId) return isSenior;
         return status;
-      },
+      }
     );
     setSeniorityStatuses(nextSeniorityStatuses);
   };
 
   const updateShifts = (entryId: number, shiftNr: string) => {
-    const nextShifts: number[] = shifts.map(
+    const nextShifts: number[] = selectedShifts.map(
       (status: number, idx: number): number => {
         if (idx === entryId) return parseInt(shiftNr, 10) || 0;
         return status;
-      },
+      }
     );
-    setShifts(nextShifts);
+    setSelectedShifts(nextShifts);
   };
 
   const addChildCard = () => {
@@ -409,6 +422,7 @@ const RegistrationForm = () => {
           key={i}
           entryId={i}
           childCount={childCount}
+          shiftDateSpans={shiftDateSpans}
           removeChildCard={removeChildCard}
           updateSeniority={updateSeniority}
           updateShifts={updateShifts}

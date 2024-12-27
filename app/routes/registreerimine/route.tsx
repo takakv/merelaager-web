@@ -20,7 +20,7 @@ import { useEffect } from "react";
 export const meta: MetaFunction = () => {
   return genMetaData(
     MetaConstants.REGISTREERIMINE,
-    "/registreerimine",
+    "/registreerimine"
   ) as MetaDescriptor[];
 };
 
@@ -34,6 +34,8 @@ export const loader = async () => {
       girlSlots: true,
       boySlotsReserve: true,
       girlSlotsReserve: true,
+      startDate: true,
+      length: true,
     },
   });
 
