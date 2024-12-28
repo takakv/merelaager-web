@@ -39,10 +39,10 @@ export const landingQuickLinks: QuickLink[] = [
     href: "/info/vahetused/#ajad",
     content: "Laagrivahetuste ajad",
   },
-  /*{
+  {
     href: "/info/maksmine/#maksumus",
-    content: "Hinnad"
-  }*/
+    content: "Hinnad",
+  },
 ];
 
 export interface PromoContent {
