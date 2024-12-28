@@ -20,15 +20,15 @@ const PriceInfo = () => {
           <div className="c-payment-block">
             <h4 className="c-payment-block__title">12päevane vahetus</h4>
             <ul className="c-payment-block__content">
-              <li>uuele tulijale: 340 €</li>
-              <li>vanale olijale: 320 €</li>
+              <li>uuele tulijale: 350 €</li>
+              <li>vanale olijale: 330 €</li>
             </ul>
           </div>
           <div className="c-payment-block">
-            <h4 className="c-payment-block__title">11päevane vahetus</h4>
+            <h4 className="c-payment-block__title">10päevane vahetus</h4>
             <ul className="c-payment-block__content">
-              <li>uuele tulijale: 320 €</li>
-              <li>vanale olijale: 300 €</li>
+              <li>uuele tulijale: 290 €</li>
+              <li>vanale olijale: 280 €</li>
             </ul>
           </div>
           <div className="c-payment-block">
