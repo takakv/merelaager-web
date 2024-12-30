@@ -2,22 +2,15 @@ import { Form, useLoaderData } from "react-router";
 import React, {
   ForwardedRef,
   forwardRef,
-  ForwardRefExoticComponent,
   JSX,
-  RefAttributes,
-  RefObject,
   useEffect,
-  useImperativeHandle,
+  useReducer,
   useRef,
   useState,
 } from "react";
 
 import { InfoBanner, WarningBanner } from "~/components/banners";
 
-import type {
-  IUpdateSeniority,
-  IUpdateShifts,
-} from "~/routes/registreerimine/inputs";
 import {
   AddendumInput,
   CityInput,
@@ -81,12 +74,10 @@ interface FormUseIDCodeRowProps extends ChildFormEntryProps {
   setUseIDCode: (useIDCode: boolean) => void;
 }
 
-const FormUseIDCodeRow: ForwardRefExoticComponent<
-  FormUseIDCodeRowProps & RefAttributes<any>
-> = forwardRef(
+const FormUseIDCodeRow = forwardRef(
   (
     { entryId, setUseIDCode }: FormUseIDCodeRowProps,
-    ref: ForwardedRef<any>
+    ref: ForwardedRef<HTMLInputElement>
   ) => {
     return (
       <div className="registration-form__row registration-form__row--minor">
@@ -100,56 +91,65 @@ const FormUseIDCodeRow: ForwardRefExoticComponent<
   }
 );
 
-interface FormShiftPickerRowProps
-  extends ChildFormEntryProps,
-    IUpdateSeniority,
-    IUpdateShifts {
+interface FormShiftPickerRowProps extends ChildFormEntryProps {
   shiftDateSpans: ShiftDateSpans;
+  onPMUpdate: (modifier: ChildPriceModifier) => void;
 }
 
-const FormShiftPickerRow: ForwardRefExoticComponent<
-  FormShiftPickerRowProps & RefAttributes<any>
-> = forwardRef(
-  (
-    {
-      entryId,
-      required,
-      shiftDateSpans,
-      updateSeniority,
-      updateShifts,
-    }: FormShiftPickerRowProps,
-    ref: ForwardedRef<any>
-  ) => {
-    const seniorityRef: RefObject<unknown> = useRef(null);
-    const shiftRef: RefObject<unknown> = useRef(null);
+const FormShiftPickerRow = ({
+  entryId,
+  required,
+  shiftDateSpans,
+  onPMUpdate,
+}: FormShiftPickerRowProps) => {
+  const [selectedShift, setSelectedShift] = useState<number>(0);
+  const [isNew, setIsNew] = useState<boolean | null>(null);
 
-    useImperativeHandle(ref, () => {
-      return {
-        senior: seniorityRef,
-        shift: shiftRef,
-      };
-    });
+  // Use refs to get the selected values even after page refreshes.
+  const selectedShiftRef = useRef<HTMLSelectElement>(null);
+  const isOldRef = useRef<HTMLInputElement>(null);
 
-    return (
-      <div className="registration-form__row has-after">
-        <ShiftInput
-          entryId={entryId}
-          isRequired={required}
-          shiftDateSpans={shiftDateSpans}
-          updateShifts={updateShifts}
-          ref={shiftRef}
-        />
-        <ShirtInput entryId={entryId} isRequired={required} />
-        <SeniorityInput
-          updateSeniority={updateSeniority}
-          entryId={entryId}
-          isRequired={required}
-          ref={seniorityRef}
-        />
-      </div>
-    );
-  }
-);
+  useEffect(() => {
+    if (selectedShiftRef.current) {
+      setSelectedShift(parseInt(selectedShiftRef.current.value, 10) || 0);
+    }
+    if (isOldRef.current) {
+      setIsNew(!isOldRef.current.checked);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Do not run for the default values.
+    if (selectedShift === 0 && isNew === null) return;
+
+    const modifier: ChildPriceModifier = {
+      childIndex: entryId,
+      shiftNr: selectedShift,
+      isNew: isNew,
+      isActive: required,
+    };
+    onPMUpdate(modifier);
+  }, [selectedShift, isNew]);
+
+  return (
+    <div className="registration-form__row has-after">
+      <ShiftInput
+        entryId={entryId}
+        isRequired={required}
+        shiftDateSpans={shiftDateSpans}
+        onChange={setSelectedShift}
+        ref={selectedShiftRef}
+      />
+      <ShirtInput entryId={entryId} isRequired={required} />
+      <SeniorityInput
+        entryId={entryId}
+        isRequired={required}
+        onChange={setIsNew}
+        ref={isOldRef}
+      />
+    </div>
+  );
+};
 
 const FormAddressRow = ({ entryId, required }: ChildFormEntryProps) => {
   return (
@@ -172,87 +172,82 @@ const FormAddendumRow = ({ entryId }: ChildFormEntryProps) => {
 
 interface RemoveChildButtonProps {
   entryId: number;
-  childCount: number;
-  removeChildCard: () => void;
+  isVisible: boolean;
+  onRemoveChild: (childIndex: number) => void;
 }
 
 const RemoveChildButton = ({
   entryId,
-  childCount,
-  removeChildCard,
+  isVisible,
+  onRemoveChild,
 }: RemoveChildButtonProps): null | JSX.Element => {
-  if (entryId !== childCount - 1 || childCount === 1) return null;
+  if (!isVisible) return null;
   return (
-    <div className="registration-form__close" onClick={removeChildCard}></div>
+    <div
+      className="registration-form__close"
+      onClick={() => onRemoveChild(entryId)}
+    ></div>
   );
 };
 
-interface ChildFormProps extends IUpdateSeniority, IUpdateShifts {
+interface ChildFormProps {
   entryId: number;
   childCount: number;
   shiftDateSpans: ShiftDateSpans;
-  removeChildCard: () => void;
+  onRemoveChild: (childIndex: number) => void;
+  onPMUpdate: (modifier: ChildPriceModifier) => void;
 }
 
-const ChildFormEntry: ForwardRefExoticComponent<
-  ChildFormProps & RefAttributes<any>
-> = forwardRef(
-  (
-    {
-      entryId,
-      childCount,
-      shiftDateSpans,
-      removeChildCard,
-      updateSeniority,
-      updateShifts,
-    }: ChildFormProps,
-    ref: ForwardedRef<any>
-  ) => {
-    const [useIDCode, setUseIDCode] = useState<boolean>(true);
-    const idCodeCheckboxRef: RefObject<null> = useRef(null);
+const ChildFormEntry = ({
+  entryId,
+  childCount,
+  shiftDateSpans,
+  onRemoveChild,
+  onPMUpdate,
+}: ChildFormProps) => {
+  const [useIDCode, setUseIDCode] = useState<boolean>(true);
 
-    const isVisible: boolean = entryId < childCount;
+  // Use refs to get the selected values even after page refreshes.
+  const idCodeCheckboxRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (idCodeCheckboxRef.current)
+      setUseIDCode(!idCodeCheckboxRef.current.checked);
+  }, []);
 
-    useEffect(() => {
-      if (idCodeCheckboxRef.current)
-        setUseIDCode(!(idCodeCheckboxRef.current as HTMLInputElement).checked);
-    }, []);
+  const isVisible: boolean = entryId < childCount;
 
-    return (
-      <div
-        className={"registration-form__unit" + (isVisible ? "" : " is-hidden")}
-      >
-        <RemoveChildButton
-          entryId={entryId}
-          childCount={childCount}
-          removeChildCard={removeChildCard}
-        />
-        <FormChildBasicRow
-          entryId={entryId}
-          required={isVisible}
-          useIDCode={useIDCode}
-        />
-        <FormUseIDCodeRow
-          entryId={entryId}
-          required={isVisible}
-          setUseIDCode={setUseIDCode}
-          ref={idCodeCheckboxRef}
-        />
-        <FormShiftPickerRow
-          entryId={entryId}
-          required={isVisible}
-          shiftDateSpans={shiftDateSpans}
-          updateSeniority={updateSeniority}
-          updateShifts={updateShifts}
-          ref={ref}
-        />
-        <p>Elukoht:</p>
-        <FormAddressRow entryId={entryId} required={isVisible} />
-        <FormAddendumRow entryId={entryId} required={isVisible} />
-      </div>
-    );
-  }
-);
+  return (
+    <div
+      className={"registration-form__unit" + (isVisible ? "" : " is-hidden")}
+    >
+      <RemoveChildButton
+        entryId={entryId}
+        isVisible={entryId === childCount - 1 && childCount !== 1}
+        onRemoveChild={onRemoveChild}
+      />
+      <FormChildBasicRow
+        entryId={entryId}
+        required={isVisible}
+        useIDCode={useIDCode}
+      />
+      <FormUseIDCodeRow
+        entryId={entryId}
+        required={isVisible}
+        setUseIDCode={setUseIDCode}
+        ref={idCodeCheckboxRef}
+      />
+      <FormShiftPickerRow
+        entryId={entryId}
+        required={isVisible}
+        shiftDateSpans={shiftDateSpans}
+        onPMUpdate={onPMUpdate}
+      />
+      <p>Elukoht:</p>
+      <FormAddressRow entryId={entryId} required={isVisible} />
+      <FormAddendumRow entryId={entryId} required={isVisible} />
+    </div>
+  );
+};
 
 const ParentFormEntry = () => {
   return (
@@ -272,12 +267,12 @@ const ParentFormEntry = () => {
 
 interface AddChildButtonProps {
   isActive: boolean;
-  addChildCard: () => void;
+  onAddChild: () => void;
 }
 
 const AddChildButton = ({
   isActive,
-  addChildCard,
+  onAddChild,
 }: AddChildButtonProps): null | JSX.Element => {
   if (!isActive) return null;
   return (
@@ -285,7 +280,7 @@ const AddChildButton = ({
       <div id="addChild">
         <div className="contents">
           <p>Lisa laps</p>
-          <div className="u-plus" onClick={addChildCard}></div>
+          <div className="u-plus" onClick={onAddChild}></div>
         </div>
       </div>
     </div>
@@ -328,87 +323,153 @@ const RegistrationSubmitButton = () => {
   );
 };
 
+export type ChildPriceModifier = {
+  childIndex: number;
+  shiftNr: number;
+  isNew: boolean | null;
+  isActive: boolean;
+};
+
+type Action =
+  | {
+      type: "changed";
+      modifier: ChildPriceModifier;
+    }
+  | {
+      type: "removed" | "added";
+      childIndex: number;
+    };
+
+const priceReducer = (modifiers: ChildPriceModifier[], action: Action) => {
+  switch (action.type) {
+    case "added":
+      return modifiers.map((m) => {
+        if (m.childIndex !== action.childIndex) return m;
+        m.isActive = true;
+        return m;
+      });
+    // How the reducer should work without the prefilled list approach.
+    /*return [
+      ...modifiers,
+      {
+        childIndex: action.childIndex,
+        shiftNr: 0,
+        isNew: null,
+      },
+    ];*/
+    case "changed":
+      return modifiers.map((m) => {
+        if (m.childIndex === action.modifier.childIndex) return action.modifier;
+        return m;
+      });
+    case "removed":
+      return modifiers.map((m) => {
+        if (m.childIndex !== action.childIndex) return m;
+        m.isActive = false;
+        return m;
+      });
+    // How the reducer should work without the prefilled list approach.
+    /*return modifiers.filter((m) => m.childIndex !== action.childIndex);*/
+  }
+};
+
 const RegistrationForm = () => {
   const { shifts } = useLoaderData<typeof loader>();
   const shiftDateSpans = getShiftDateSpans(shifts);
 
   const maxChildCount = 4;
   const upfrontRegistrationFee = 100;
-  const shiftFullPrice = 240;
-  const shortDiscount = 20;
+  const shiftFullPrice = 350;
   const seniorityDiscount = 20;
 
-  const [childCount, setChildCount] = useState<number>(1);
-  const [canAddMoreChildren, setCanAddMoreChildren] = useState<boolean>(true);
-  const [seniorityStatuses, setSeniorityStatuses] = useState<boolean[]>([]);
-  const [selectedShifts, setSelectedShifts] = useState<number[]>([]);
+  const specialPrices = [
+    {
+      shiftNr: 1,
+      fullPrice: 290,
+      discount: 10,
+    },
+  ];
 
-  const childrenRef: RefObject<unknown> = useRef(null);
-  useEffect(() => {
-    const initialSeniorityStatuses: boolean[] = [];
-    const initialShifts: number[] = [];
+  // Always set up price modifiers for all potential children, even if less
+  // children are registered at once. This is a lazy way to enable keeping the
+  // price state consistent even across page refreshes.
+  // TODO: find a more elegant approach.
+  const [priceModifiers, dispatch] = useReducer(
+    priceReducer,
+    Array.from(Array(maxChildCount).entries(), ([i, _]) => {
+      return {
+        childIndex: i,
+        shiftNr: 0,
+        isNew: null,
+        isActive: i === 0,
+      };
+    })
+  );
 
-    (childrenRef.current as Map<number, any>).forEach((value) => {
-      initialSeniorityStatuses.push(value.senior.current.checked);
-      initialShifts.push(parseInt(value.shift.current.value, 10) || 0);
-    });
+  /*
+  const [priceModifiers, dispatch] = useReducer(priceReducer, [
+    {
+      childIndex: 0,
+      shiftNr: 0,
+      isNew: null,
+    },
+  ]);*/
 
-    setSeniorityStatuses(initialSeniorityStatuses);
-    setSelectedShifts(initialShifts);
-  }, []);
-
-  const getUpdatedPrice = (): number => {
-    let totalShiftPrice: number = childCount * shiftFullPrice;
-    for (let i = 0; i < childCount; ++i) {
-      if (selectedShifts[i] === 1) totalShiftPrice -= shortDiscount;
-      if (seniorityStatuses[i]) totalShiftPrice -= seniorityDiscount;
-    }
-    return totalShiftPrice;
-  };
-
-  const updateSeniority = (entryId: number, isSenior: boolean) => {
-    const nextSeniorityStatuses: boolean[] = seniorityStatuses.map(
-      (status: boolean, idx: number): boolean => {
-        if (idx === entryId) return isSenior;
-        return status;
-      }
-    );
-    setSeniorityStatuses(nextSeniorityStatuses);
-  };
-
-  const updateShifts = (entryId: number, shiftNr: string) => {
-    const nextShifts: number[] = selectedShifts.map(
-      (status: number, idx: number): number => {
-        if (idx === entryId) return parseInt(shiftNr, 10) || 0;
-        return status;
-      }
-    );
-    setSelectedShifts(nextShifts);
-  };
-
-  const addChildCard = () => {
-    const resultingChildCount: number = childCount + 1;
+  const handleAddChild = () => {
+    const resultingChildCount = childCount + 1;
     if (resultingChildCount > maxChildCount) return;
     if (resultingChildCount === maxChildCount) setCanAddMoreChildren(false);
+
+    dispatch({
+      type: "added",
+      childIndex: childCount,
+    });
     setChildCount(resultingChildCount);
   };
 
-  const removeChildCard = () => {
+  const handleEditModifier = (modifier: ChildPriceModifier) => {
+    dispatch({
+      type: "changed",
+      modifier,
+    });
+  };
+
+  const handleRemoveChild = (childIndex: number) => {
     const resultingChildCount: number = childCount - 1;
     if (resultingChildCount < 1) return;
     if (resultingChildCount < maxChildCount) setCanAddMoreChildren(true);
     setChildCount(resultingChildCount);
+
+    dispatch({
+      type: "removed",
+      childIndex: childIndex,
+    });
   };
 
-  const getMap = (): Map<number, any> => {
-    if (!childrenRef.current) {
-      childrenRef.current = new Map<number, any>();
+  const [childCount, setChildCount] = useState<number>(1);
+  const [canAddMoreChildren, setCanAddMoreChildren] = useState<boolean>(true);
+
+  const getUpdatedPrice = (): number => {
+    let totalShiftPrice = 0;
+    for (let i = 0; i < childCount; i++) {
+      let fullPrice = shiftFullPrice;
+      let discount = seniorityDiscount;
+      const specialPrice = specialPrices.find(
+        (e) => e.shiftNr === priceModifiers[i].shiftNr
+      );
+      if (specialPrice) {
+        fullPrice = specialPrice.fullPrice;
+        discount = specialPrice.discount;
+      }
+      totalShiftPrice += fullPrice;
+      // Do not apply the discount if the status is unknown (null).
+      if (priceModifiers[i].isNew === false) totalShiftPrice -= discount;
     }
-    return childrenRef.current as Map<number, any>;
+    return totalShiftPrice;
   };
 
   const registrationFee: number = childCount * upfrontRegistrationFee;
-  const fullPrice: number = getUpdatedPrice() + registrationFee;
+  const fullPrice: number = getUpdatedPrice();
 
   return (
     <Form method="post" className="registration-form" id="regform">
@@ -423,22 +484,13 @@ const RegistrationForm = () => {
           entryId={i}
           childCount={childCount}
           shiftDateSpans={shiftDateSpans}
-          removeChildCard={removeChildCard}
-          updateSeniority={updateSeniority}
-          updateShifts={updateShifts}
-          ref={(node) => {
-            const map: Map<number, any> = getMap();
-            if (node) {
-              map.set(i, node);
-            } else {
-              map.delete(i);
-            }
-          }}
+          onRemoveChild={handleRemoveChild}
+          onPMUpdate={handleEditModifier}
         />
       ))}
       <AddChildButton
         isActive={canAddMoreChildren}
-        addChildCard={addChildCard}
+        onAddChild={handleAddChild}
       />
       <h4>Kontaktisik</h4>
       <ParentFormEntry />

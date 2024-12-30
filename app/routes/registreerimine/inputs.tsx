@@ -1,17 +1,7 @@
-import type {
-  ChangeEvent,
-  ForwardedRef,
-  ForwardRefExoticComponent,
-  RefAttributes,
-} from "react";
+import { ChangeEvent, ForwardedRef } from "react";
 import React, { forwardRef } from "react";
-import { Link, useLoaderData } from "react-router";
-import { loader } from "~/routes/registreerimine/route";
+import { Link } from "react-router";
 import { ShiftDateSpans } from "~/utils/shift-dates";
-
-export interface IUpdateShifts {
-  updateShifts: (entryId: number, shift: string) => void;
-}
 
 interface FormInputProps {
   entryId: number;
@@ -20,22 +10,22 @@ interface FormInputProps {
 }
 
 const counties: string[] = [
-  "Harju",
-  "Tartu",
-  "Ida-Viru",
-  "Pärnu",
-  "Lääne-Viru",
-  "Viljandi",
-  "Rapla",
-  "Võru",
-  "Saare",
-  "Jõgeva",
-  "Järva",
-  "Valga",
-  "Põlva",
-  "Lääne",
-  "Hiiu",
-].map((county: string): string => county + "maa");
+  "Harjumaa",
+  "Tartumaa",
+  "Ida-Virumaa",
+  "Pärnumaa",
+  "Lääne-Virumaa",
+  "Viljandimaa",
+  "Raplamaa",
+  "Võrumaa",
+  "Saaremaa",
+  "Jõgevamaa",
+  "Järvamaa",
+  "Valgamaa",
+  "Põlvamaa",
+  "Läänemaa",
+  "Hiiumaa",
+];
 
 export const NameInput = ({ entryId, isRequired }: FormInputProps) => {
   return (
@@ -128,12 +118,13 @@ interface UseIDCodeInputProps extends FormInputProps {
   setUseIDCode: (useIDCode: boolean) => void;
 }
 
-export const UseIDCodeInput: ForwardRefExoticComponent<
-  UseIDCodeInputProps & RefAttributes<any>
-> = forwardRef(
-  ({ entryId, setUseIDCode }: UseIDCodeInputProps, ref: ForwardedRef<any>) => {
-    const handleChange = ({ target }: ChangeEvent) => {
-      setUseIDCode(!(target as HTMLInputElement).checked);
+export const UseIDCodeInput = forwardRef(
+  (
+    { entryId, setUseIDCode }: UseIDCodeInputProps,
+    ref: ForwardedRef<HTMLInputElement>
+  ) => {
+    const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
+      setUseIDCode(!target.checked);
     };
 
     return (
@@ -153,20 +144,20 @@ export const UseIDCodeInput: ForwardRefExoticComponent<
   }
 );
 
-interface ShiftInputProps extends FormInputProps, IUpdateShifts {
+interface ShiftInputProps extends FormInputProps {
   shiftDateSpans: ShiftDateSpans;
+  onChange: (newShift: number) => void;
 }
 
-export const ShiftInput: ForwardRefExoticComponent<
-  ShiftInputProps & RefAttributes<any>
-> = forwardRef(
+export const ShiftInput = forwardRef(
   (
-    { entryId, isRequired, shiftDateSpans, updateShifts }: ShiftInputProps,
-    ref: ForwardedRef<any>
+    { entryId, isRequired, shiftDateSpans, onChange }: ShiftInputProps,
+    ref: ForwardedRef<HTMLSelectElement>
   ) => {
-    const handleSelection = ({ target }: ChangeEvent) => {
-      const value: string = (target as HTMLSelectElement).value;
-      updateShifts(entryId, value);
+    const handleSelection = ({ target }: ChangeEvent<HTMLSelectElement>) => {
+      const value = parseInt(target.value, 10);
+      if (isNaN(value)) return; // someone is messing around
+      onChange(value);
     };
 
     const options = [];
@@ -185,14 +176,14 @@ export const ShiftInput: ForwardRefExoticComponent<
           Laagrivahetus
         </label>
         <select
+          ref={ref}
           id={`vahetus-${entryId}`}
           className="shiftField"
           name="shiftNr"
           required={isRequired}
           onChange={handleSelection}
-          ref={ref}
         >
-          <option value="">--Valige vahetus--</option>
+          <option value={0}>--Valige vahetus--</option>
           {options.map((option) => option)}
         </select>
       </div>
@@ -225,22 +216,19 @@ export const ShirtInput = ({ entryId, isRequired }: FormInputProps) => {
   );
 };
 
-export interface IUpdateSeniority {
-  updateSeniority: (entryId: number, isSenior: boolean) => void;
+interface SeniorityInputProps extends FormInputProps {
+  onChange: (isNew: boolean) => void;
 }
 
-interface SeniorityInputProps extends FormInputProps, IUpdateSeniority {}
-
-export const SeniorityInput: ForwardRefExoticComponent<
-  SeniorityInputProps & RefAttributes<any>
-> = forwardRef(
+export const SeniorityInput = forwardRef(
   (
-    { entryId, isRequired, updateSeniority }: SeniorityInputProps,
-    ref: ForwardedRef<any>
+    { entryId, isRequired, onChange }: SeniorityInputProps,
+    ref: ForwardedRef<HTMLInputElement>
   ) => {
-    const handleToggle = ({ target }: ChangeEvent) => {
-      const value: string = (target as HTMLInputElement).value;
-      updateSeniority(entryId, value === "no");
+    const handleToggle = ({ target }: ChangeEvent<HTMLInputElement>) => {
+      const value: string = target.value;
+      if (value !== "true" && value !== "false") return; // someone is messing around
+      onChange(value === "true");
     };
 
     return (
@@ -253,7 +241,7 @@ export const SeniorityInput: ForwardRefExoticComponent<
             defaultChecked={false}
             id={`newcomer-${entryId}-y`}
             name={`newcomer-${entryId}`}
-            value="yes"
+            value="true"
             className="newField-y nf"
             onChange={handleToggle}
             required={isRequired}
@@ -267,7 +255,7 @@ export const SeniorityInput: ForwardRefExoticComponent<
             defaultChecked={false}
             id={`newcomer-${entryId}-n`}
             name={`newcomer-${entryId}`}
-            value="no"
+            value="false"
             className="newField-n nf"
             onChange={handleToggle}
             required={isRequired}
