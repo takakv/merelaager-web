@@ -1,10 +1,11 @@
 import { Link } from "react-router";
-import type { ReactElement } from "react";
+import React, { ReactElement } from "react";
 import { Fragment } from "react";
 import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
+import Email from "~/components/email";
 
 export const meta: MetaFunction = () => {
   return genMetaData(MetaConstants.INFO, "/info") as MetaDescriptor[];
@@ -36,12 +37,12 @@ const cardsInfo: InfoCard[] = [
   {
     title: "Vahetused ja broneerimine",
     description:
-      "Suve jooksul toimub 4 erinevat laagrivahetust, igaüks erineva ilma, tegevuskava ja seltskonnaga. Üks täispikk vahetus kestab 12 päeva ja lühike vahetus 8 päeva. Enamasti tahavad lapsed tagasi tulla juba tuttavasse vahetusse, ent alati on ka neid, kes soovivad erinevad vahetused läbi proovida, sest sõpru leiab alati.",
+      "Suve jooksul toimub 4 erinevat laagrivahetust, igaüks erineva ilma, tegevuskava ja seltskonnaga. Üks täispikk vahetus kestab 12 päeva ja lühike vahetus 10 päeva. Enamasti tahavad lapsed tagasi tulla juba tuttavasse vahetusse, ent alati on ka neid, kes soovivad erinevad vahetused läbi proovida, sest sõpru leiab alati.",
     linkSuffix: "vahetused/",
     refs: [
       { id: "#ajad", description: "Laagrivahetuste ajad" },
-      { id: "#broneerimine", description: "Broneerimine" }
-    ]
+      { id: "#broneerimine", description: "Broneerimine" },
+    ],
   },
   {
     title: "Hinnad ja maksmine",
@@ -50,8 +51,8 @@ const cardsInfo: InfoCard[] = [
     linkSuffix: "maksmine/",
     refs: [
       { id: "#maksumus", description: "Laagrikoha maksumus" },
-      { id: "#makseinfo", description: "Makseinfo" }
-    ]
+      { id: "#makseinfo", description: "Makseinfo" },
+    ],
   },
   {
     title: "Elu laagris",
@@ -62,8 +63,8 @@ const cardsInfo: InfoCard[] = [
       { id: "#asukoht", description: "Asukoht ja kogunemine" },
       { id: "#laagrisse-kaasa", description: "Laagrisse kaasa" },
       { id: "#kava", description: "Päevakava" },
-      { id: "#kodukord", description: "Kodukord" }
-    ]
+      { id: "#kodukord", description: "Kodukord" },
+    ],
   },
   {
     title: "Korduma kippuvad küsimused",
@@ -76,18 +77,18 @@ const cardsInfo: InfoCard[] = [
       { id: "#tervis", description: "Terviserike või õnnetusjuhtum" },
       { id: "#ujumisoskus", description: "Ujumisoskus" },
       { id: "#purjetamisoskus", description: "Purjetamisoskus" },
-      { id: "#osalustasu", description: "Osalemistasu tagasimaksmine" }
+      { id: "#osalustasu", description: "Osalemistasu tagasimaksmine" },
     ],
     addendum: (
       <p className="u-mt-15">
         Kui te oma küsimustele kusagilt vastust ei leia, kirjutage meile:{" "}
-        <Link to="mailto:info@merelaager.ee" className="t-visible">
-          info@merelaager.ee
-        </Link>
+        <span className="t-visible">
+          <Email username="info" />
+        </span>
         .
       </p>
-    )
-  }
+    ),
+  },
 ];
 
 const InfoCardRefs = ({ linkSuffix, refs }: ReferenceLinksProp) => {
