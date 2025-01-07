@@ -57,7 +57,7 @@ const FormChildBasicRow = ({
   errors,
 }: FormChildBasicRowProps) => {
   return (
-    <div className="registration-form__row has-after">
+    <div className="column-row">
       <NameInput entryId={entryId} isRequired={required} error={errors?.name} />
       <IDCodeInput
         entryId={entryId}
@@ -93,13 +93,7 @@ const FormUseIDCodeRow = forwardRef(
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     return (
-      <div className="registration-form__row registration-form__row--minor">
-        <UseIDCodeInput
-          entryId={entryId}
-          setUseIDCode={setUseIDCode}
-          ref={ref}
-        />
-      </div>
+      <UseIDCodeInput entryId={entryId} setUseIDCode={setUseIDCode} ref={ref} />
     );
   }
 );
@@ -147,20 +141,22 @@ const FormShiftPickerRow = ({
   }, [selectedShift, isNew]);
 
   return (
-    <div className="registration-form__row has-after">
-      <ShiftInput
-        entryId={entryId}
-        isRequired={required}
-        shiftDateSpans={shiftDateSpans}
-        onChange={setSelectedShift}
-        ref={selectedShiftRef}
-        error={errors?.shift}
-      />
-      <ShirtInput
-        entryId={entryId}
-        isRequired={required}
-        error={errors?.shirtSize}
-      />
+    <>
+      <div className="column-row">
+        <ShiftInput
+          entryId={entryId}
+          isRequired={required}
+          shiftDateSpans={shiftDateSpans}
+          onChange={setSelectedShift}
+          ref={selectedShiftRef}
+          error={errors?.shift}
+        />
+        <ShirtInput
+          entryId={entryId}
+          isRequired={required}
+          error={errors?.shirtSize}
+        />
+      </div>
       <SeniorityInput
         entryId={entryId}
         isRequired={required}
@@ -168,32 +164,45 @@ const FormShiftPickerRow = ({
         ref={isOldRef}
         error={errors?.newcomer}
       />
-    </div>
+    </>
   );
 };
 
 const FormAddressRow = ({ entryId, required, errors }: ChildFormEntryProps) => {
   return (
-    <div className="registration-form__row">
-      <RoadInput entryId={entryId} isRequired={required} error={errors?.road} />
-      <CityInput entryId={entryId} isRequired={required} error={errors?.city} />
-      <CountyInput
-        entryId={entryId}
-        isRequired={required}
-        error={errors?.county}
-      />
-      <CountryInput
-        entryId={entryId}
-        isRequired={required}
-        error={errors?.country}
-      />
+    <div className="row-group">
+      <p>Elukoht:</p>
+      <div className="column-row">
+        <RoadInput
+          entryId={entryId}
+          isRequired={required}
+          error={errors?.road}
+        />
+        <CityInput
+          entryId={entryId}
+          isRequired={required}
+          error={errors?.city}
+        />
+      </div>
+      <div className="column-row">
+        <CountyInput
+          entryId={entryId}
+          isRequired={required}
+          error={errors?.county}
+        />
+        <CountryInput
+          entryId={entryId}
+          isRequired={required}
+          error={errors?.country}
+        />
+      </div>
     </div>
   );
 };
 
 const FormAddendumRow = ({ entryId, errors }: ChildFormEntryProps) => {
   return (
-    <div className="registration-form__row">
+    <div className="column-row">
       <AddendumInput entryId={entryId} error={errors?.addendum} />
     </div>
   );
@@ -256,28 +265,41 @@ const ChildFormEntry = ({
         isVisible={entryId === childCount - 1 && childCount !== 1}
         onRemoveChild={onRemoveChild}
       />
-      <FormChildBasicRow
-        entryId={entryId}
-        required={isVisible}
-        useIDCode={useIDCode}
-        errors={errors}
-      />
-      <FormUseIDCodeRow
-        entryId={entryId}
-        required={isVisible}
-        setUseIDCode={setUseIDCode}
-        ref={idCodeCheckboxRef}
-      />
-      <FormShiftPickerRow
-        entryId={entryId}
-        required={isVisible}
-        shiftDateSpans={shiftDateSpans}
-        onPMUpdate={onPMUpdate}
-        errors={errors}
-      />
-      <p>Elukoht:</p>
-      <FormAddressRow entryId={entryId} required={isVisible} errors={errors} />
-      <FormAddendumRow entryId={entryId} required={isVisible} errors={errors} />
+      <div className="registration-row">
+        <div className="registration-column">
+          <FormChildBasicRow
+            entryId={entryId}
+            required={isVisible}
+            useIDCode={useIDCode}
+            errors={errors}
+          />
+          <FormUseIDCodeRow
+            entryId={entryId}
+            required={isVisible}
+            setUseIDCode={setUseIDCode}
+            ref={idCodeCheckboxRef}
+          />
+          <FormAddressRow
+            entryId={entryId}
+            required={isVisible}
+            errors={errors}
+          />
+        </div>
+        <div className="registration-column">
+          <FormShiftPickerRow
+            entryId={entryId}
+            required={isVisible}
+            shiftDateSpans={shiftDateSpans}
+            onPMUpdate={onPMUpdate}
+            errors={errors}
+          />
+          <FormAddendumRow
+            entryId={entryId}
+            required={isVisible}
+            errors={errors}
+          />
+        </div>
+      </div>
     </div>
   );
 };

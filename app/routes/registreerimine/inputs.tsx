@@ -149,7 +149,7 @@ export const UseIDCodeInput = forwardRef(
     };
 
     return (
-      <div className="registration-form__field registration-form__field--row">
+      <div className="column-row">
         <label htmlFor={`useIdCode-${entryId}`}>Pole Eesti isikukoodi</label>
         <input
           type="checkbox"
@@ -255,7 +255,7 @@ export const SeniorityInput = forwardRef(
     };
 
     return (
-      <div className="registration-form__field registration-form__field--row">
+      <div className="column-row">
         <p className="u-required">Esimest korda merelaagris?</p>
         <div className="group">
           <label htmlFor={`newcomer-${entryId}-y`}>Jah</label>
@@ -379,7 +379,7 @@ export const CountryInput = ({
 export const AddendumInput = ({ entryId, error }: FormInputProps) => {
   const maxLength: number = STRING_MAX;
   return (
-    <div className="registration-form__field registration-form__field--full">
+    <div className="registration-form__field">
       <label htmlFor={`addendum-${entryId}`}>
         Muu info (allergiad, erivajadused jms):
       </label>
