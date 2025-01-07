@@ -1,10 +1,11 @@
 import {
   ActionFunctionArgs,
+  Link,
   MetaDescriptor,
   MetaFunction,
-  redirect,
+  useActionData,
+  useLoaderData,
 } from "react-router";
-import { Link, useActionData, useLoaderData } from "react-router";
 
 import { prisma } from "~/db.server";
 
@@ -15,7 +16,6 @@ import Email from "~/components/email";
 
 import { RegistrationSection } from "~/routes/registreerimine/registration";
 import { formAction } from "~/routes/registreerimine/action";
-import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {
   return genMetaData(
@@ -149,29 +149,28 @@ const FreeSpaceSection = () => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const response = await formAction(await request.formData());
-  console.log(response);
-  if (response.ok) {
-    return redirect("/registreerimine/edu");
-  }
-
-  return response;
+  return await formAction(await request.formData());
 };
 
 export default function RegistrationRoute() {
   const actionData = useActionData<typeof action>();
-
+  const errors = actionData?.errors;
+  if (errors) {
+    console.log(errors);
+  }
+  /*
   useEffect(() => {
     if (!actionData || actionData.ok) return;
 
     alert(`Registreerimine ei õnnestunud.\n\nPõhjus: ${actionData.message}`);
   }, [actionData]);
+  */
 
   return (
     <main>
       <RefsSection />
       <FreeSpaceSection />
-      <RegistrationSection />
+      <RegistrationSection errors={errors} />
     </main>
   );
 }

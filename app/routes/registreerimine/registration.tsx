@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 
-import { InfoBanner, WarningBanner } from "~/components/banners";
+import { WarningBanner } from "~/components/banners";
 
 import {
   AddendumInput,
@@ -33,10 +33,17 @@ import {
 } from "~/routes/registreerimine/inputs";
 import { loader } from "~/routes/registreerimine/route";
 import { getShiftDateSpans, ShiftDateSpans } from "~/utils/shift-dates";
+import { REG_MAX_COUNT } from "~/hcdb";
+import type {
+  ChildFormFieldError,
+  FormErrorInfo,
+  ParentFormFieldErrors,
+} from "~/routes/registreerimine/action";
 
 interface ChildFormEntryProps {
   entryId: number;
   required: boolean;
+  errors: ChildFormFieldError | undefined;
 }
 
 interface FormChildBasicRowProps extends ChildFormEntryProps {
@@ -47,30 +54,36 @@ const FormChildBasicRow = ({
   entryId,
   required,
   useIDCode,
+  errors,
 }: FormChildBasicRowProps) => {
   return (
     <div className="registration-form__row has-after">
-      <NameInput entryId={entryId} isRequired={required} />
+      <NameInput entryId={entryId} isRequired={required} error={errors?.name} />
       <IDCodeInput
         entryId={entryId}
         isRequired={required && useIDCode}
         isHidden={!useIDCode}
+        error={errors?.idCode}
       />
       <SexInput
         entryId={entryId}
         isRequired={required && !useIDCode}
         isHidden={useIDCode}
+        error={errors?.sex}
       />
       <DOBInput
         entryId={entryId}
         isRequired={required && !useIDCode}
         isHidden={useIDCode}
+        error={errors?.dob}
       />
     </div>
   );
 };
 
-interface FormUseIDCodeRowProps extends ChildFormEntryProps {
+interface FormUseIDCodeRowProps {
+  entryId: number;
+  required: boolean;
   setUseIDCode: (useIDCode: boolean) => void;
 }
 
@@ -94,6 +107,7 @@ const FormUseIDCodeRow = forwardRef(
 interface FormShiftPickerRowProps extends ChildFormEntryProps {
   shiftDateSpans: ShiftDateSpans;
   onPMUpdate: (modifier: ChildPriceModifier) => void;
+  errors: ChildFormFieldError | undefined;
 }
 
 const FormShiftPickerRow = ({
@@ -101,6 +115,7 @@ const FormShiftPickerRow = ({
   required,
   shiftDateSpans,
   onPMUpdate,
+  errors,
 }: FormShiftPickerRowProps) => {
   const [selectedShift, setSelectedShift] = useState<number>(0);
   const [isNew, setIsNew] = useState<boolean | null>(null);
@@ -139,33 +154,47 @@ const FormShiftPickerRow = ({
         shiftDateSpans={shiftDateSpans}
         onChange={setSelectedShift}
         ref={selectedShiftRef}
+        error={errors?.shift}
       />
-      <ShirtInput entryId={entryId} isRequired={required} />
+      <ShirtInput
+        entryId={entryId}
+        isRequired={required}
+        error={errors?.shirtSize}
+      />
       <SeniorityInput
         entryId={entryId}
         isRequired={required}
         onChange={setIsNew}
         ref={isOldRef}
+        error={errors?.newcomer}
       />
     </div>
   );
 };
 
-const FormAddressRow = ({ entryId, required }: ChildFormEntryProps) => {
+const FormAddressRow = ({ entryId, required, errors }: ChildFormEntryProps) => {
   return (
     <div className="registration-form__row">
-      <RoadInput entryId={entryId} isRequired={required} />
-      <CityInput entryId={entryId} isRequired={required} />
-      <CountyInput entryId={entryId} isRequired={required} />
-      <CountryInput entryId={entryId} isRequired={required} />
+      <RoadInput entryId={entryId} isRequired={required} error={errors?.road} />
+      <CityInput entryId={entryId} isRequired={required} error={errors?.city} />
+      <CountyInput
+        entryId={entryId}
+        isRequired={required}
+        error={errors?.county}
+      />
+      <CountryInput
+        entryId={entryId}
+        isRequired={required}
+        error={errors?.country}
+      />
     </div>
   );
 };
 
-const FormAddendumRow = ({ entryId }: ChildFormEntryProps) => {
+const FormAddendumRow = ({ entryId, errors }: ChildFormEntryProps) => {
   return (
     <div className="registration-form__row">
-      <AddendumInput entryId={entryId} />
+      <AddendumInput entryId={entryId} error={errors?.addendum} />
     </div>
   );
 };
@@ -196,6 +225,7 @@ interface ChildFormProps {
   shiftDateSpans: ShiftDateSpans;
   onRemoveChild: (childIndex: number) => void;
   onPMUpdate: (modifier: ChildPriceModifier) => void;
+  errors: ChildFormFieldError | undefined;
 }
 
 const ChildFormEntry = ({
@@ -204,6 +234,7 @@ const ChildFormEntry = ({
   shiftDateSpans,
   onRemoveChild,
   onPMUpdate,
+  errors,
 }: ChildFormProps) => {
   const [useIDCode, setUseIDCode] = useState<boolean>(true);
 
@@ -229,6 +260,7 @@ const ChildFormEntry = ({
         entryId={entryId}
         required={isVisible}
         useIDCode={useIDCode}
+        errors={errors}
       />
       <FormUseIDCodeRow
         entryId={entryId}
@@ -241,24 +273,29 @@ const ChildFormEntry = ({
         required={isVisible}
         shiftDateSpans={shiftDateSpans}
         onPMUpdate={onPMUpdate}
+        errors={errors}
       />
       <p>Elukoht:</p>
-      <FormAddressRow entryId={entryId} required={isVisible} />
-      <FormAddendumRow entryId={entryId} required={isVisible} />
+      <FormAddressRow entryId={entryId} required={isVisible} errors={errors} />
+      <FormAddendumRow entryId={entryId} required={isVisible} errors={errors} />
     </div>
   );
 };
 
-const ParentFormEntry = () => {
+const ParentFormEntry = ({
+  errors,
+}: {
+  errors: ParentFormFieldErrors | undefined;
+}) => {
   return (
     <div className="registration-form__unit">
       <div className="registration-form__row">
-        <ParentNameInput />
-        <ParentPhoneInput />
-        <ParentEmailInput />
+        <ParentNameInput error={errors?.contactName} />
+        <ParentPhoneInput error={errors?.contactNumber} />
+        <ParentEmailInput error={errors?.contactEmail} />
       </div>
       <div className="registration-form__row">
-        <ParentBackupPhoneInput />
+        <ParentBackupPhoneInput error={errors?.backupTel} />
         <TermsAcknowledgeInput />
       </div>
     </div>
@@ -288,14 +325,14 @@ const AddChildButton = ({
 };
 
 const RegistrationSubmitButton = () => {
-  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   /*
-  const unlockTime = new Date(Date.parse("01 Jan 2024 11:59:59 UTC")).getTime();
+  const unlockTime = UNLOCK_TIME;
   const now = Date.now();
 
   useEffect(() => {
-    if (now > unlockTime) {
+    if (now >= unlockTime) {
       setIsDisabled(false);
       return () => {};
     }
@@ -307,7 +344,7 @@ const RegistrationSubmitButton = () => {
     }, eta);
     return () => clearTimeout(timer);
   }, []);
-  */
+   */
 
   return (
     <button
@@ -373,11 +410,16 @@ const priceReducer = (modifiers: ChildPriceModifier[], action: Action) => {
   }
 };
 
-const RegistrationForm = () => {
+const RegistrationForm = ({
+  errors,
+}: {
+  errors: FormErrorInfo | undefined;
+}) => {
   const { shifts } = useLoaderData<typeof loader>();
+
   const shiftDateSpans = getShiftDateSpans(shifts);
 
-  const maxChildCount = 4;
+  const maxChildCount = REG_MAX_COUNT;
   const upfrontRegistrationFee = 100;
   const shiftFullPrice = 350;
   const seniorityDiscount = 20;
@@ -486,6 +528,7 @@ const RegistrationForm = () => {
           shiftDateSpans={shiftDateSpans}
           onRemoveChild={handleRemoveChild}
           onPMUpdate={handleEditModifier}
+          errors={errors ? errors[i] : undefined}
         />
       ))}
       <AddChildButton
@@ -493,7 +536,7 @@ const RegistrationForm = () => {
         onAddChild={handleAddChild}
       />
       <h4>Kontaktisik</h4>
-      <ParentFormEntry />
+      <ParentFormEntry errors={errors} />
       <input
         type="number"
         name="childCount"
@@ -508,11 +551,16 @@ const RegistrationForm = () => {
         Broneerimistasu: <span id="pre-total">{registrationFee}</span>€ |
         Kogusumma: <span id="payment-total">{fullPrice}</span>€
       </p>
+      {errors?.error ? <WarningBanner>{errors.error}</WarningBanner> : null}
     </Form>
   );
 };
 
-export const RegistrationSection = () => {
+export const RegistrationSection = ({
+  errors,
+}: {
+  errors: FormErrorInfo | undefined;
+}) => {
   return (
     <section className="c-section">
       <div className="o-container">
@@ -531,7 +579,7 @@ export const RegistrationSection = () => {
           Vabade kohtade puudumisel saate registreeruda reservnimekirja selle
           sama vormi abil.
         </InfoBanner>*/}
-        <RegistrationForm />
+        <RegistrationForm errors={errors} />
       </div>
     </section>
   );

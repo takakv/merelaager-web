@@ -13,6 +13,11 @@
 import type { ReactElement } from "react";
 
 export const YEAR: number = 2025;
+export const UNLOCK_TIME = new Date(
+  Date.parse("12 Jan 2025 12:00:00 UTC")
+).getTime();
+
+export const REG_MAX_COUNT = 4;
 
 export const LANDING_TAGLINE: string = "Kohtumiseni suvel";
 export const LANDING_SUBTEXT: string = "- Merelaager -";

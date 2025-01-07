@@ -1,9 +1,12 @@
-import { ChangeEvent, ForwardedRef } from "react";
-import React, { forwardRef } from "react";
+import React, { ChangeEvent, ForwardedRef, forwardRef } from "react";
 import { Link } from "react-router";
 import { ShiftDateSpans } from "~/utils/shift-dates";
 
-interface FormInputProps {
+type FormInputErrorProp = {
+  error: string | undefined;
+};
+
+interface FormInputProps extends FormInputErrorProp {
   entryId: number;
   isRequired?: boolean;
   isHidden?: boolean;
@@ -27,7 +30,9 @@ const counties: string[] = [
   "Hiiumaa",
 ];
 
-export const NameInput = ({ entryId, isRequired }: FormInputProps) => {
+const STRING_MAX = 255;
+
+export const NameInput = ({ entryId, isRequired, error }: FormInputProps) => {
   return (
     <div className="registration-form__field">
       <label htmlFor={`name-${entryId}`} className="u-required">
@@ -40,6 +45,7 @@ export const NameInput = ({ entryId, isRequired }: FormInputProps) => {
         className="nameField"
         required={isRequired}
       />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
@@ -48,6 +54,7 @@ export const IDCodeInput = ({
   entryId,
   isRequired,
   isHidden,
+  error,
 }: FormInputProps) => {
   return (
     <div
@@ -64,11 +71,17 @@ export const IDCodeInput = ({
         pattern="[0-9]{11}"
         required={isRequired}
       />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const SexInput = ({ entryId, isRequired, isHidden }: FormInputProps) => {
+export const SexInput = ({
+  entryId,
+  isRequired,
+  isHidden,
+  error,
+}: FormInputProps) => {
   return (
     <div
       className={"registration-form__field" + (isHidden ? " is-hidden" : "")}
@@ -91,11 +104,17 @@ export const SexInput = ({ entryId, isRequired, isHidden }: FormInputProps) => {
         value="F"
         required={isRequired}
       />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const DOBInput = ({ entryId, isRequired, isHidden }: FormInputProps) => {
+export const DOBInput = ({
+  entryId,
+  isRequired,
+  isHidden,
+  error,
+}: FormInputProps) => {
   return (
     <div
       className={"registration-form__field" + (isHidden ? " is-hidden" : "")}
@@ -110,11 +129,13 @@ export const DOBInput = ({ entryId, isRequired, isHidden }: FormInputProps) => {
         className="DOBField"
         required={isRequired}
       />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-interface UseIDCodeInputProps extends FormInputProps {
+interface UseIDCodeInputProps {
+  entryId: number;
   setUseIDCode: (useIDCode: boolean) => void;
 }
 
@@ -151,7 +172,7 @@ interface ShiftInputProps extends FormInputProps {
 
 export const ShiftInput = forwardRef(
   (
-    { entryId, isRequired, shiftDateSpans, onChange }: ShiftInputProps,
+    { entryId, isRequired, shiftDateSpans, onChange, error }: ShiftInputProps,
     ref: ForwardedRef<HTMLSelectElement>
   ) => {
     const handleSelection = ({ target }: ChangeEvent<HTMLSelectElement>) => {
@@ -183,15 +204,16 @@ export const ShiftInput = forwardRef(
           required={isRequired}
           onChange={handleSelection}
         >
-          <option value={0}>--Valige vahetus--</option>
+          <option value="">--Valige vahetus--</option>
           {options.map((option) => option)}
         </select>
+        {error ? <em>{error}</em> : null}
       </div>
     );
   }
 );
 
-export const ShirtInput = ({ entryId, isRequired }: FormInputProps) => {
+export const ShirtInput = ({ entryId, isRequired, error }: FormInputProps) => {
   return (
     <div className="registration-form__field">
       <label htmlFor={`shirtSize-${entryId}`} className="u-required">
@@ -212,6 +234,7 @@ export const ShirtInput = ({ entryId, isRequired }: FormInputProps) => {
         <option value="L">L</option>
         <option value="XL">XL</option>
       </select>
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
@@ -222,7 +245,7 @@ interface SeniorityInputProps extends FormInputProps {
 
 export const SeniorityInput = forwardRef(
   (
-    { entryId, isRequired, onChange }: SeniorityInputProps,
+    { entryId, isRequired, onChange, error }: SeniorityInputProps,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     const handleToggle = ({ target }: ChangeEvent<HTMLInputElement>) => {
@@ -261,12 +284,13 @@ export const SeniorityInput = forwardRef(
             required={isRequired}
           />
         </div>
+        {error ? <em>{error}</em> : null}
       </div>
     );
   }
 );
 
-export const RoadInput = ({ entryId, isRequired }: FormInputProps) => {
+export const RoadInput = ({ entryId, isRequired, error }: FormInputProps) => {
   return (
     <div className="registration-form__field">
       <label htmlFor={`road-${entryId}`} className="u-required">
@@ -278,12 +302,14 @@ export const RoadInput = ({ entryId, isRequired }: FormInputProps) => {
         id={`road-${entryId}`}
         className="roadField"
         required={isRequired}
+        maxLength={STRING_MAX}
       />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const CityInput = ({ entryId, isRequired }: FormInputProps) => {
+export const CityInput = ({ entryId, isRequired, error }: FormInputProps) => {
   return (
     <div className="registration-form__field">
       <label htmlFor={`city-${entryId}`} className="u-required">
@@ -295,12 +321,14 @@ export const CityInput = ({ entryId, isRequired }: FormInputProps) => {
         id={`city-${entryId}`}
         className="cityField"
         required={isRequired}
+        maxLength={STRING_MAX}
       />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const CountyInput = ({ entryId, isRequired }: FormInputProps) => {
+export const CountyInput = ({ entryId, isRequired, error }: FormInputProps) => {
   return (
     <div className="registration-form__field">
       <label htmlFor={`county-${entryId}`} className="u-required">
@@ -312,17 +340,23 @@ export const CountyInput = ({ entryId, isRequired }: FormInputProps) => {
         name="county"
         className="countyField"
         required={isRequired}
+        maxLength={STRING_MAX}
       />
       <datalist id="counties">
         {counties.map((county: string) => (
           <option key={county}>{county}</option>
         ))}
       </datalist>
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const CountryInput = ({ entryId, isRequired }: FormInputProps) => {
+export const CountryInput = ({
+  entryId,
+  isRequired,
+  error,
+}: FormInputProps) => {
   return (
     <div className="registration-form__field">
       <label htmlFor={`country-${entryId}`} className="u-required">
@@ -335,13 +369,15 @@ export const CountryInput = ({ entryId, isRequired }: FormInputProps) => {
         defaultValue="Eesti"
         className="countryField"
         required={isRequired}
+        maxLength={STRING_MAX}
       />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const AddendumInput = ({ entryId }: FormInputProps) => {
-  const maxLength: number = 255;
+export const AddendumInput = ({ entryId, error }: FormInputProps) => {
+  const maxLength: number = STRING_MAX;
   return (
     <div className="registration-form__field registration-form__field--full">
       <label htmlFor={`addendum-${entryId}`}>
@@ -354,48 +390,71 @@ export const AddendumInput = ({ entryId }: FormInputProps) => {
         placeholder={`Võib tühjaks jääda (maksimum ${maxLength} tähemärki).`}
         maxLength={maxLength}
       ></textarea>
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const ParentNameInput = () => {
+export const ParentNameInput = ({ error }: FormInputErrorProp) => {
   return (
     <div className="registration-form__field">
       <label htmlFor="guardian_name" className="u-required">
         Nimi
       </label>
-      <input type="text" name="contactName" id="guardian_name" required />
+      <input
+        type="text"
+        name="contactName"
+        id="guardian_name"
+        required
+        maxLength={STRING_MAX}
+      />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const ParentPhoneInput = () => {
+export const ParentPhoneInput = ({ error }: FormInputErrorProp) => {
   return (
     <div className="registration-form__field">
       <label htmlFor="guardian_phone" className="u-required">
         Telefon
       </label>
-      <input type="tel" name="contactNumber" id="guardian_phone" required />
+      <input
+        type="tel"
+        name="contactNumber"
+        id="guardian_phone"
+        required
+        maxLength={20}
+      />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const ParentEmailInput = () => {
+export const ParentEmailInput = ({ error }: FormInputErrorProp) => {
   return (
     <div className="registration-form__field">
       <label htmlFor="guardian_email" className="u-required">
         E-post
       </label>
-      <input type="email" name="contactEmail" id="guardian_email" required />
+      <input
+        type="email"
+        name="contactEmail"
+        id="guardian_email"
+        required
+        maxLength={STRING_MAX}
+      />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };
 
-export const ParentBackupPhoneInput = () => {
+export const ParentBackupPhoneInput = ({ error }: FormInputErrorProp) => {
   return (
     <div className="registration-form__field">
       <label htmlFor="alt_phone">Varutelefon</label>
-      <input type="tel" name="backupTel" id="alt_phone" />
+      <input type="tel" name="backupTel" id="alt_phone" maxLength={20} />
+      {error ? <em>{error}</em> : null}
     </div>
   );
 };

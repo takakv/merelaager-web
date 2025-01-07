@@ -8,6 +8,10 @@ const BUILD_PATH = "./build/server/index.js";
 const DEVELOPMENT = process.env.NODE_ENV === "development";
 const PORT = Number.parseInt(process.env.PORT || "3000");
 
+if (!process.env.REGISTRATION_URL) {
+  throw new Error("Registration URL is missing");
+}
+
 const app = express();
 
 app.use(compression());
