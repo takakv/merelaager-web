@@ -325,7 +325,7 @@ const AddChildButton = ({
 };
 
 const RegistrationSubmitButton = () => {
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
 
   /*
   const unlockTime = UNLOCK_TIME;
