@@ -257,32 +257,34 @@ export const SeniorityInput = forwardRef(
     return (
       <div className="column-row">
         <p className="u-required">Esimest korda merelaagris?</p>
-        <div className="group">
-          <label htmlFor={`newcomer-${entryId}-y`}>Jah</label>
-          <input
-            type="radio"
-            defaultChecked={false}
-            id={`newcomer-${entryId}-y`}
-            name={`newcomer-${entryId}`}
-            value="true"
-            className="newField-y nf"
-            onChange={handleToggle}
-            required={isRequired}
-          />
-        </div>
-        <div className="group">
-          <label htmlFor={`newcomer-${entryId}-n`}>Ei</label>
-          <input
-            type="radio"
-            ref={ref}
-            defaultChecked={false}
-            id={`newcomer-${entryId}-n`}
-            name={`newcomer-${entryId}`}
-            value="false"
-            className="newField-n nf"
-            onChange={handleToggle}
-            required={isRequired}
-          />
+        <div className="nowrap">
+          <div>
+            <label htmlFor={`newcomer-${entryId}-y`}>Jah</label>
+            <input
+              type="radio"
+              defaultChecked={false}
+              id={`newcomer-${entryId}-y`}
+              name={`newcomer-${entryId}`}
+              value="true"
+              className="newField-y nf"
+              onChange={handleToggle}
+              required={isRequired}
+            />
+          </div>
+          <div>
+            <label htmlFor={`newcomer-${entryId}-n`}>Ei</label>
+            <input
+              type="radio"
+              ref={ref}
+              defaultChecked={false}
+              id={`newcomer-${entryId}-n`}
+              name={`newcomer-${entryId}`}
+              value="false"
+              className="newField-n nf"
+              onChange={handleToggle}
+              required={isRequired}
+            />
+          </div>
         </div>
         {error ? <em>{error}</em> : null}
       </div>
@@ -383,13 +385,15 @@ export const AddendumInput = ({ entryId, error }: FormInputProps) => {
       <label htmlFor={`addendum-${entryId}`}>
         Muu info (allergiad, erivajadused jms):
       </label>
-      <textarea
-        name="addendum"
-        id={`addendum-${entryId}`}
-        className="full-width"
-        placeholder={`Võib tühjaks jääda (maksimum ${maxLength} tähemärki).`}
-        maxLength={maxLength}
-      ></textarea>
+      <div>
+        <textarea
+          name="addendum"
+          id={`addendum-${entryId}`}
+          className="full-width"
+          placeholder={`Võib tühjaks jääda (maksimum ${maxLength} tähemärki).`}
+          maxLength={maxLength}
+        ></textarea>
+      </div>
       {error ? <em>{error}</em> : null}
     </div>
   );
@@ -461,7 +465,7 @@ export const ParentBackupPhoneInput = ({ error }: FormInputErrorProp) => {
 
 export const TermsAcknowledgeInput = () => {
   return (
-    <div className="registration-form__field registration-form__field--row">
+    <>
       <label htmlFor="disclaimer" className="u-required">
         Nõustun laagri{" "}
         <Link to="/info/laagrist/#kodukord" className="t-visible">
@@ -470,6 +474,6 @@ export const TermsAcknowledgeInput = () => {
         .
       </label>
       <input type="checkbox" id="disclaimer" required autoComplete="off" />
-    </div>
+    </>
   );
 };

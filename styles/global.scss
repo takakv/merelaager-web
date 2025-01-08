@@ -1250,12 +1250,16 @@ a {
 
 // Registration Form
 .registration-form {
-  &__unit {
+  &__card {
     position: relative;
     margin: 2em;
     padding: 2em;
     border-radius: 8px;
     box-shadow: 0 8px 16px rgba(var(--primary-rgb), 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 2em;
+    row-gap: 1em;
 
     @media screen and (max-width: $tablet-break) {
       margin: 0 0 2em;
@@ -1358,34 +1362,8 @@ a {
     }
   }
 
-  &__row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1em;
-    margin-bottom: 0.5rem;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    &--minor {
-      font-size: 0.75rem;
-      justify-content: flex-end;
-    }
-  }
-
-  &__row.has-after &__field {
-    @media screen and (min-width: $laptop-break) {
-      margin-bottom: 0;
-    }
-  }
-
   &__field {
     flex: 1;
-
-    &:last-child {
-      margin-right: 0;
-    }
 
     &--full {
       align-items: flex-start;
@@ -1395,6 +1373,10 @@ a {
 
     textarea {
       resize: vertical;
+    }
+
+    select {
+      display: block;
     }
 
     input,
@@ -1618,30 +1600,34 @@ a {
   }
 }
 
-.registration-row {
+.column-row, .row {
   display: flex;
+  gap: 1em;
   flex-wrap: wrap;
-  gap: 2em;
+
+  &.fill {
+    width: 100%;
+  }
 }
 
-.registration-column {
+.card-column {
   display: flex;
   flex-direction: column;
   flex: 1;
   gap: 1em;
 
-  .column-row {
+  .row-group {
     display: flex;
+    flex-direction: column;
     gap: 1em;
-    flex-wrap: wrap;
-  }
-}
 
-.row-group {
-  .column-row:first-of-type {
-    margin-bottom: 1em;
     @media screen and (min-width: $page-max-width) {
-      margin-bottom: 0.5em;
+      gap: 0.5em;
     }
+  }
+
+  .nowrap {
+    display: flex;
+    gap: 0.5em;
   }
 }

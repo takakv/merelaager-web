@@ -258,47 +258,45 @@ const ChildFormEntry = ({
 
   return (
     <div
-      className={"registration-form__unit" + (isVisible ? "" : " is-hidden")}
+      className={"registration-form__card" + (isVisible ? "" : " is-hidden")}
     >
       <RemoveChildButton
         entryId={entryId}
         isVisible={entryId === childCount - 1 && childCount !== 1}
         onRemoveChild={onRemoveChild}
       />
-      <div className="registration-row">
-        <div className="registration-column">
-          <FormChildBasicRow
-            entryId={entryId}
-            required={isVisible}
-            useIDCode={useIDCode}
-            errors={errors}
-          />
-          <FormUseIDCodeRow
-            entryId={entryId}
-            required={isVisible}
-            setUseIDCode={setUseIDCode}
-            ref={idCodeCheckboxRef}
-          />
-          <FormAddressRow
-            entryId={entryId}
-            required={isVisible}
-            errors={errors}
-          />
-        </div>
-        <div className="registration-column">
-          <FormShiftPickerRow
-            entryId={entryId}
-            required={isVisible}
-            shiftDateSpans={shiftDateSpans}
-            onPMUpdate={onPMUpdate}
-            errors={errors}
-          />
-          <FormAddendumRow
-            entryId={entryId}
-            required={isVisible}
-            errors={errors}
-          />
-        </div>
+      <div className="card-column">
+        <FormChildBasicRow
+          entryId={entryId}
+          required={isVisible}
+          useIDCode={useIDCode}
+          errors={errors}
+        />
+        <FormUseIDCodeRow
+          entryId={entryId}
+          required={isVisible}
+          setUseIDCode={setUseIDCode}
+          ref={idCodeCheckboxRef}
+        />
+        <FormAddressRow
+          entryId={entryId}
+          required={isVisible}
+          errors={errors}
+        />
+      </div>
+      <div className="card-column">
+        <FormShiftPickerRow
+          entryId={entryId}
+          required={isVisible}
+          shiftDateSpans={shiftDateSpans}
+          onPMUpdate={onPMUpdate}
+          errors={errors}
+        />
+        <FormAddendumRow
+          entryId={entryId}
+          required={isVisible}
+          errors={errors}
+        />
       </div>
     </div>
   );
@@ -310,14 +308,16 @@ const ParentFormEntry = ({
   errors: ParentFormFieldErrors | undefined;
 }) => {
   return (
-    <div className="registration-form__unit">
-      <div className="registration-form__row">
+    <div className="registration-form__card">
+      <div className="card-column">
         <ParentNameInput error={errors?.contactName} />
-        <ParentPhoneInput error={errors?.contactNumber} />
         <ParentEmailInput error={errors?.contactEmail} />
       </div>
-      <div className="registration-form__row">
+      <div className="card-column">
+        <ParentPhoneInput error={errors?.contactNumber} />
         <ParentBackupPhoneInput error={errors?.backupTel} />
+      </div>
+      <div className="row fill">
         <TermsAcknowledgeInput />
       </div>
     </div>
@@ -335,7 +335,7 @@ const AddChildButton = ({
 }: AddChildButtonProps): null | JSX.Element => {
   if (!isActive) return null;
   return (
-    <div className="registration-form__unit registration-form__unit--mt0">
+    <div className="registration-form__card registration-form__card--mt0">
       <div id="addChild">
         <div className="contents">
           <p>Lisa laps</p>
