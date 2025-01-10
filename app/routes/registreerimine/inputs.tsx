@@ -42,7 +42,7 @@ export const NameInput = ({ entryId, isRequired, error }: FormInputProps) => {
         type="text"
         name="name"
         id={`name-${entryId}`}
-        className="nameField"
+        className={error ? "is-invalid" : undefined}
         required={isRequired}
       />
       {error ? <em>{error}</em> : null}
@@ -67,7 +67,7 @@ export const IDCodeInput = ({
         type="text"
         name="idCode"
         id={`idCode-${entryId}`}
-        className="idCodeField"
+        className={error ? "is-invalid" : undefined}
         pattern="[0-9]{11}"
         required={isRequired}
       />
@@ -93,7 +93,7 @@ export const SexInput = ({
         name="sex"
         id={`sex-m-${entryId}`}
         value="M"
-        className="sexField"
+        className={error ? "is-invalid" : undefined}
         required={isRequired}
       />
       <label htmlFor={`sex-f-${entryId}`}>Tüdruk</label>
@@ -126,7 +126,7 @@ export const DOBInput = ({
         type="date"
         name="dob"
         id={`dob-${entryId}`}
-        className="DOBField"
+        className={error ? "is-invalid" : undefined}
         required={isRequired}
       />
       {error ? <em>{error}</em> : null}
@@ -199,7 +199,7 @@ export const ShiftInput = forwardRef(
         <select
           ref={ref}
           id={`vahetus-${entryId}`}
-          className="shiftField"
+          className={error ? "is-invalid" : undefined}
           name="shiftNr"
           required={isRequired}
           onChange={handleSelection}
@@ -221,7 +221,7 @@ export const ShirtInput = ({ entryId, isRequired, error }: FormInputProps) => {
       </label>
       <select
         id={`shirtSize-${entryId}`}
-        className="shirtSizeField"
+        className={error ? "is-invalid" : undefined}
         name="tsSize"
         required={isRequired}
       >
@@ -302,7 +302,7 @@ export const RoadInput = ({ entryId, isRequired, error }: FormInputProps) => {
         type="text"
         name="road"
         id={`road-${entryId}`}
-        className="roadField"
+        className={error ? "is-invalid" : undefined}
         required={isRequired}
         maxLength={STRING_MAX}
       />
@@ -321,7 +321,7 @@ export const CityInput = ({ entryId, isRequired, error }: FormInputProps) => {
         type="text"
         name="city"
         id={`city-${entryId}`}
-        className="cityField"
+        className={error ? "is-invalid" : undefined}
         required={isRequired}
         maxLength={STRING_MAX}
       />
@@ -340,7 +340,7 @@ export const CountyInput = ({ entryId, isRequired, error }: FormInputProps) => {
         list="counties"
         id={`county-${entryId}`}
         name="county"
-        className="countyField"
+        className={error ? "is-invalid" : undefined}
         required={isRequired}
         maxLength={STRING_MAX}
       />
@@ -369,7 +369,7 @@ export const CountryInput = ({
         name="country"
         id={`country-${entryId}`}
         defaultValue="Eesti"
-        className="countryField"
+        className={error ? "is-invalid" : undefined}
         required={isRequired}
         maxLength={STRING_MAX}
       />
@@ -389,7 +389,7 @@ export const AddendumInput = ({ entryId, error }: FormInputProps) => {
         <textarea
           name="addendum"
           id={`addendum-${entryId}`}
-          className="full-width"
+          className={error ? "is-invalid full-width" : "full-width"}
           placeholder={`Võib tühjaks jääda (maksimum ${maxLength} tähemärki).`}
           maxLength={maxLength}
         ></textarea>
@@ -411,6 +411,7 @@ export const ParentNameInput = ({ error }: FormInputErrorProp) => {
         id="guardian_name"
         required
         maxLength={STRING_MAX}
+        className={error ? "is-invalid" : undefined}
       />
       {error ? <em>{error}</em> : null}
     </div>
@@ -429,6 +430,7 @@ export const ParentPhoneInput = ({ error }: FormInputErrorProp) => {
         id="guardian_phone"
         required
         maxLength={20}
+        className={error ? "is-invalid" : undefined}
       />
       {error ? <em>{error}</em> : null}
     </div>
@@ -447,6 +449,7 @@ export const ParentEmailInput = ({ error }: FormInputErrorProp) => {
         id="guardian_email"
         required
         maxLength={STRING_MAX}
+        className={error ? "is-invalid" : undefined}
       />
       {error ? <em>{error}</em> : null}
     </div>
@@ -457,7 +460,13 @@ export const ParentBackupPhoneInput = ({ error }: FormInputErrorProp) => {
   return (
     <div className="registration-form__field">
       <label htmlFor="alt_phone">Varutelefon</label>
-      <input type="tel" name="backupTel" id="alt_phone" maxLength={20} />
+      <input
+        type="tel"
+        name="backupTel"
+        id="alt_phone"
+        maxLength={20}
+        className={error ? "is-invalid" : undefined}
+      />
       {error ? <em>{error}</em> : null}
     </div>
   );

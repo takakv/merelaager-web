@@ -282,6 +282,7 @@ export const formAction = async (form: FormData) => {
   }
 
   if (Object.keys(errors).length > 0) {
+    errors.error = "Mõni kohustuslik väli on vigane või puudu";
     return data({ errors }, { status: StatusCodes.BAD_REQUEST });
   }
 

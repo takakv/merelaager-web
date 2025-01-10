@@ -1379,6 +1379,12 @@ a {
       display: block;
     }
 
+    input, textarea, select {
+      &:user-invalid, &.is-invalid {
+        border-color: var(--highlight);
+      }
+    }
+
     input,
     textarea {
       display: block;
@@ -1389,9 +1395,14 @@ a {
       background-color: rgba(var(--primary-rgb), 0.05);
       min-width: 200px;
 
-      &:user-invalid {
-        border-color: var(--highlight);
+      // Override the potential is-invalid class
+      // after the user has made a change.
+      // For some reason this does not work as expected.
+      /*
+      &:user-valid {
+        border-color: transparent;
       }
+      */
 
       &:focus-visible {
         border-color: rgba(var(--primary-rgb), 1);
