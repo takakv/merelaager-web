@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 
-import { WarningBanner } from "~/components/banners";
+import { InfoBanner, WarningBanner } from "~/components/banners";
 
 import {
   AddendumInput,
@@ -587,20 +587,13 @@ export const RegistrationSection = ({
     <section className="c-section">
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
-        <WarningBanner>
-          NB! Registreerimine algab 12. jaanuaril 2025 kell 14.00.
-          Laagrivahetuste kuupäevad võivad muutuda kuni 10. jaanuarini!
-        </WarningBanner>
-        {/*<WarningBanner>
-          <b>NB!</b> Registreerimiskinnitus ei ole enam automaatne.
-          Registreerimiskinnituse saate meilile siis, kui juhataja on koha
-          kinnitanud. Kohtade kinnitamine toimub endiselt ajalise järjekorra
-          põhiselt.
-        </WarningBanner>
+        <InfoBanner>
+          Registreerimine algab 12. jaanuaril 2025 kell 14.00.
+        </InfoBanner>
         <InfoBanner>
           Vabade kohtade puudumisel saate registreeruda reservnimekirja selle
           sama vormi abil.
-        </InfoBanner>*/}
+        </InfoBanner>
         <RegistrationForm errors={errors} />
       </div>
     </section>

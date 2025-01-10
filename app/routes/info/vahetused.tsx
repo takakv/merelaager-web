@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import { Fragment } from "react";
 
 import Email from "~/components/email";
-import { InfoBanner, WarningBanner } from "~/components/banners";
+import { InfoBanner } from "~/components/banners";
 
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
@@ -295,11 +295,6 @@ const ShiftDatesSection = () => {
     <section className="c-section" id="ajad">
       <div className="o-container">
         <h3 className="c-section-heading">{shiftYear} Laagrivahetuste ajad</h3>
-        <WarningBanner>
-          Tähelepanu! Merelaagri 2025. aasta kuupäevad on esialgsed ja võivad
-          10. jaanuaril erakorraliste põhjuste tõttu muutuda. Seetõttu algab
-          registreerimine 12. jaanuaril 2025 kell 14.00. Rohkem infot peagi.
-        </WarningBanner>
         <CalendarsComponent shifts={shifts} />
         <ShiftInfoComponent shifts={shifts} />
       </div>
