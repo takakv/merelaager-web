@@ -28,10 +28,10 @@ export interface QuickLink {
 }
 
 export const landingQuickLinks: QuickLink[] = [
-  /*{
+  {
     href: "/registreerimine/",
-    content: "Registreerimine"
-  },*/
+    content: "Registreerimine",
+  },
   /*{
     href: "/info/laagrist/#asukoht",
     content: "Asukoht ja kogunemine"
