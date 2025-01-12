@@ -5,6 +5,12 @@ import { REG_MAX_COUNT, UNLOCK_TIME } from "~/hcdb";
 import { JSendResponse, RegistrationAPIRequest } from "~/utils/api.types";
 import { StatusCodes } from "http-status-codes";
 
+// Send registration emails except when disabled for development purposes.
+const SEND_EMAIL = !(
+  process.env.NODE_ENV === "development" &&
+  process.env.SEND_REG_EMAIL === "false"
+);
+
 export type ChildFormBasicFields = {
   name?: string;
   idCode?: string;
@@ -236,6 +242,7 @@ export const formAction = async (form: FormData) => {
       contactName: contactName,
       contactEmail: contactEmail,
       contactNumber: contactNumber,
+      sendEmail: SEND_EMAIL,
     };
 
     if (addendum !== "") childRegistrationData.addendum = addendum;
@@ -320,6 +327,8 @@ export const formAction = async (form: FormData) => {
 
   if (!response.ok) {
     const body = await response.text();
+    console.log(body);
+    console.log(form);
     let jsonBody: JSendResponse | null = null;
     try {
       jsonBody = JSON.parse(body);

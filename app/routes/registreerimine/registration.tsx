@@ -33,7 +33,7 @@ import {
 } from "~/routes/registreerimine/inputs";
 import { loader } from "~/routes/registreerimine/route";
 import { getShiftDateSpans, ShiftDateSpans } from "~/utils/shift-dates";
-import { REG_MAX_COUNT } from "~/hcdb";
+import { REG_MAX_COUNT, UNLOCK_TIME } from "~/hcdb";
 import type {
   ChildFormFieldError,
   FormErrorInfo,
@@ -346,27 +346,25 @@ const AddChildButton = ({
   );
 };
 
-const RegistrationSubmitButton = () => {
-  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+type RegistrationSubmitButtonProps = {
+  currentTime: number;
+};
 
-  /*
-  const unlockTime = UNLOCK_TIME;
-  const now = Date.now();
+const RegistrationSubmitButton = ({
+  currentTime,
+}: RegistrationSubmitButtonProps) => {
+  const [isDisabled, setIsDisabled] = useState<boolean>(
+    currentTime < UNLOCK_TIME
+  );
 
-  useEffect(() => {
-    if (now >= unlockTime) {
-      setIsDisabled(false);
-      return () => {};
-    }
-
-    const eta = unlockTime - now;
-    console.log(`Unlock ETA: ${eta}`);
+  if (isDisabled) {
+    const eta = UNLOCK_TIME - currentTime;
+    console.log(`Unlock ETA: ${eta} ms`);
     const timer = setTimeout(() => {
       setIsDisabled(false);
+      clearInterval(timer);
     }, eta);
-    return () => clearTimeout(timer);
-  }, []);
-   */
+  }
 
   return (
     <button
@@ -437,7 +435,7 @@ const RegistrationForm = ({
 }: {
   errors: FormErrorInfo | undefined;
 }) => {
-  const { shifts } = useLoaderData<typeof loader>();
+  const { shifts, currentTime } = useLoaderData<typeof loader>();
 
   const shiftDateSpans = getShiftDateSpans(shifts);
 
@@ -568,12 +566,22 @@ const RegistrationForm = ({
         readOnly
         required
       />
-      <RegistrationSubmitButton />
+      <RegistrationSubmitButton currentTime={currentTime} />
       <p className="u-inline-block u-ml-15">
         Broneerimistasu: <span id="pre-total">{registrationFee}</span>€ |
         Kogusumma: <span id="payment-total">{fullPrice}</span>€
       </p>
       {errors?.error ? <WarningBanner>{errors.error}</WarningBanner> : null}
+      {errors?.json ? (
+        <WarningBanner>
+          Server tuvastas vea:
+          <br />
+          {JSON.stringify(errors.json)}
+          <br />
+          Kui viga on arusaamatu või vigane, saatke meil aadressile:
+          taaniel@merelaager.ee
+        </WarningBanner>
+      ) : null}
     </Form>
   );
 };

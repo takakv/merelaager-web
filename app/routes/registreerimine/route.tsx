@@ -3,6 +3,7 @@ import {
   Link,
   MetaDescriptor,
   MetaFunction,
+  redirect,
   useActionData,
   useLoaderData,
 } from "react-router";
@@ -88,6 +89,7 @@ export const loader = async () => {
   return {
     shifts,
     remainingSlots,
+    currentTime: Date.now(),
   };
 };
 
@@ -169,7 +171,9 @@ const FreeSpaceSection = () => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  return await formAction(await request.formData());
+  const res = await formAction(await request.formData());
+  if (res === null) return redirect("/registreermine/edu");
+  return res;
 };
 
 export default function RegistrationRoute() {
