@@ -225,10 +225,10 @@ export const formAction = async (form: FormData) => {
     }
 
     const entry = form.get(`newcomer-${i}`);
-    if (!entry) {
+    if (entry === null) {
       fieldErrors.newcomer = "Väli on kohustuslik";
     }
-    const isNewcomer = String(entry) === "yes";
+    const isNewcomer = String(entry) === "true";
 
     const childRegistrationData: RegistrationAPIRequest = {
       name: name,
