@@ -9,10 +9,9 @@ import { InfoBanner } from "~/components/banners";
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
 
-import { prisma } from "~/db.server";
-
 import { YEAR } from "~/hcdb";
 import { getShiftDateSpan, ShiftDateInfo } from "~/utils/shift-dates";
+import { getFreeSlots } from "~/utils/slots";
 
 interface ShiftInfo extends ShiftDateInfo {
   shiftNr: number;
@@ -30,9 +29,10 @@ export const meta: MetaFunction = () => {
 
 interface InfoCardProps {
   shiftInfo: ShiftInfo;
+  remainingSlots: { M: number; F: number };
 }
 
-const InfoCard = ({ shiftInfo }: InfoCardProps) => {
+const InfoCard = ({ shiftInfo, remainingSlots }: InfoCardProps) => {
   const numerals = ["I", "II", "III", "IV", "V"];
 
   return (
@@ -44,14 +44,25 @@ const InfoCard = ({ shiftInfo }: InfoCardProps) => {
         <span className="u-wave" />
         {shiftInfo.length} päeva
       </div>
-      <div className="details-contact">
-        <p>
-          <b>{shiftInfo.bossName}</b>
-        </p>
-        <p>
-          <Email username={shiftInfo.bossUsername} />
-        </p>
-        <p>{shiftInfo.bossPhone}</p>
+      <div className="c-details__body">
+        <div className="details-contact">
+          <p>
+            <b>{shiftInfo.bossName}</b>
+          </p>
+          <p>
+            <Email username={shiftInfo.bossUsername} />
+          </p>
+          <p>{shiftInfo.bossPhone}</p>
+        </div>
+        <div className="details-slots">
+          <p>
+            <b>Vabad kohad:</b>
+          </p>
+          <div className="slots">
+            <div>Poisid: {remainingSlots.M < 0 ? 0 : remainingSlots.M}</div>
+            <div>Tüdrukud: {remainingSlots.F < 0 ? 0 : remainingSlots.F}</div>
+          </div>
+        </div>
       </div>
       {/*<div class="contact__free"><div class="count">-</div></div>*/}
     </div>
@@ -60,11 +71,16 @@ const InfoCard = ({ shiftInfo }: InfoCardProps) => {
 
 interface ShiftInfoProps {
   shifts: ShiftInfo[];
+  remainingSlots: { [i: number]: { M: number; F: number } };
 }
 
-const ShiftInfoComponent = ({ shifts }: ShiftInfoProps) => {
+const ShiftInfoComponent = ({ shifts, remainingSlots }: ShiftInfoProps) => {
   const infoCards = shifts.map((shift) => (
-    <InfoCard key={shift.shiftNr} shiftInfo={shift} />
+    <InfoCard
+      key={shift.shiftNr}
+      shiftInfo={shift}
+      remainingSlots={remainingSlots[shift.shiftNr]}
+    />
   ));
   return (
     <Fragment>
@@ -159,11 +175,11 @@ const CalendarMonth = ({ monthIndex, activeDays }: CalendarMonthProps) => {
   );
 };
 
-interface ShiftInfoProps {
+interface CalendarComponentProps {
   shifts: ShiftInfo[];
 }
 
-const CalendarsComponent = ({ shifts }: ShiftInfoProps) => {
+const CalendarsComponent = ({ shifts }: CalendarComponentProps) => {
   // TODO: improve the logic.
   const activeMonths: { [property: string]: ActiveDay[] } = {};
   for (const [i, shift] of shifts.entries()) {
@@ -260,26 +276,17 @@ const RegistrationSection = () => {
 };
 
 export const loader = async () => {
-  const dbShifts = await prisma.shiftInfo.findMany({
-    select: {
-      id: true,
-      startDate: true,
-      length: true,
-      bossName: true,
-      bossEmail: true,
-      bossPhone: true,
-    },
-  });
+  const { shifts, remainingSlots } = await getFreeSlots();
 
-  return { dbShifts };
+  return { shifts, remainingSlots };
 };
 
 const ShiftDatesSection = () => {
-  const { dbShifts } = useLoaderData<typeof loader>();
+  const { shifts, remainingSlots } = useLoaderData<typeof loader>();
 
-  const shifts: ShiftInfo[] = [];
-  dbShifts.forEach((shift) => {
-    shifts.push({
+  const mappedShifts: ShiftInfo[] = [];
+  shifts.forEach((shift) => {
+    mappedShifts.push({
       shiftNr: shift.id,
       bossName: shift.bossName,
       bossUsername: shift.bossEmail.split("@")[0],
@@ -289,14 +296,17 @@ const ShiftDatesSection = () => {
     });
   });
 
-  const shiftYear = shifts[0].startDate.getUTCFullYear();
+  const shiftYear = mappedShifts[0].startDate.getUTCFullYear();
 
   return (
     <section className="c-section" id="ajad">
       <div className="o-container">
         <h3 className="c-section-heading">{shiftYear} Laagrivahetuste ajad</h3>
-        <CalendarsComponent shifts={shifts} />
-        <ShiftInfoComponent shifts={shifts} />
+        <CalendarsComponent shifts={mappedShifts} />
+        <ShiftInfoComponent
+          shifts={mappedShifts}
+          remainingSlots={remainingSlots}
+        />
       </div>
     </section>
   );

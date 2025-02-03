@@ -1125,6 +1125,11 @@ a {
     background-image: url(/img/smallwave_o.svg);
     background-repeat: no-repeat;
   }
+
+  &__body {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 // Calendar

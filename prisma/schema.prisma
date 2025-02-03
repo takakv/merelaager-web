@@ -199,6 +199,7 @@ model ShiftInfo {
   girlSlots        Int            @default(20) @db.UnsignedInt
   boySlotsReserve  Int            @default(2) @db.UnsignedInt
   girlSlotsReserve Int            @default(2) @db.UnsignedInt
+  maxFreeDisplay   Int            @default(20) @db.UnsignedInt
   registrations    Registration[]
   boss             User?          @relation(fields: [bossId], references: [id], onDelete: NoAction, map: "shifts_ibfk_1")
 

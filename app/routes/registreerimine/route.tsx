@@ -8,8 +8,6 @@ import {
   useLoaderData,
 } from "react-router";
 
-import { prisma } from "~/db.server";
-
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
 
@@ -17,6 +15,7 @@ import Email from "~/components/email";
 
 import { RegistrationSection } from "~/routes/registreerimine/registration";
 import { formAction } from "~/routes/registreerimine/action";
+import { getFreeSlots } from "~/utils/slots";
 
 export const meta: MetaFunction = () => {
   return genMetaData(
@@ -26,65 +25,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async () => {
-  const shifts = await prisma.shiftInfo.findMany({
-    select: {
-      id: true,
-      bossEmail: true,
-      bossPhone: true,
-      boySlots: true,
-      girlSlots: true,
-      boySlotsReserve: true,
-      girlSlotsReserve: true,
-      startDate: true,
-      length: true,
-    },
-  });
-
-  const remainingSlots: { [shiftNr: number]: { M: number; F: number } } = {};
-  shifts.forEach((shift) => {
-    remainingSlots[shift.id] = {
-      M: shift.boySlots - shift.boySlotsReserve,
-      F: shift.girlSlots - shift.girlSlotsReserve,
-    };
-  });
-
-  const registrations = await prisma.registration.findMany({
-    where: {
-      isRegistered: true,
-    },
-    select: {
-      shiftNr: true,
-      children: {
-        select: {
-          gender: true,
-        },
-      },
-    },
-  });
-
-  registrations.forEach((registration) => {
-    remainingSlots[registration.shiftNr][registration.children.gender] -= 1;
-  });
-
-  // Display the max number of slots, disregarding reserve, in case nobody
-  // has been registered yet. This prevents confusion as to why registration
-  // counters are lower than expected at the start of the registration period.
-  shifts.forEach((shift) => {
-    const maxFreeBoySlots = shift.boySlots - shift.boySlotsReserve;
-    const maxFreeGirlSlots = shift.girlSlots - shift.girlSlotsReserve;
-    if (
-      remainingSlots[shift.id].M >= 0 &&
-      remainingSlots[shift.id].M === maxFreeBoySlots
-    ) {
-      remainingSlots[shift.id].M = shift.boySlots;
-    }
-    if (
-      remainingSlots[shift.id].F >= 0 &&
-      remainingSlots[shift.id].F === maxFreeGirlSlots
-    ) {
-      remainingSlots[shift.id].F = shift.girlSlots;
-    }
-  });
+  const { shifts, remainingSlots } = await getFreeSlots();
 
   return {
     shifts,

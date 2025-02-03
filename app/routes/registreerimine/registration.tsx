@@ -595,9 +595,11 @@ export const RegistrationSection = ({
     <section className="c-section">
       <div className="o-container">
         <h3 className="c-section-heading">Registreerimine</h3>
+        {/**
         <InfoBanner>
           Registreerimine algab 12. jaanuaril 2025 kell 14.00.
         </InfoBanner>
+        **/}
         <InfoBanner>
           Vabade kohtade puudumisel saate registreeruda reservnimekirja selle
           sama vormi abil.
