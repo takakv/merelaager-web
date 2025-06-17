@@ -31,16 +31,16 @@ export const getFreeSlots = async () => {
     },
     select: {
       shiftNr: true,
-      children: {
+      child: {
         select: {
-          gender: true,
+          sex: true,
         },
       },
     },
   });
 
   registrations.forEach((registration) => {
-    remainingSlots[registration.shiftNr][registration.children.gender] -= 1;
+    remainingSlots[registration.shiftNr][registration.child.sex] -= 1;
   });
 
   // Display the max number of slots, disregarding reserve, in case nobody
