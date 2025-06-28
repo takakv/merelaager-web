@@ -5,6 +5,14 @@
 public/*
 !public/.gitkeep
 
+!public/img/
+public/img/*
+!public/img/*.svg
+
+!public/img/sponsors/
+public/img/sponsors/*
+!public/img/sponsors/*.svg
+
 # Styles should be re-generated with SASS
 *.css
 *.css.map
