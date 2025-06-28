@@ -1,6 +1,6 @@
+import type { MetaDescriptor, MetaFunction } from "react-router";
 import { Link } from "react-router";
 import { Fragment, JSX } from "react";
-import type { MetaDescriptor, MetaFunction } from "react-router";
 
 import { genMetaData } from "~/utils/metagen";
 import MetaConstants from "~/utils/meta-constants";
@@ -51,13 +51,13 @@ const LocationSection = () => {
         <p className="u-mt-1em">Kui tee peal hätta jääte, helistage meile!</p>
         <iframe
           title="Merelaagri asukoht"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d54753.2513076819!2d24.07959290554487!3d59.33662882458193!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4692a67d0aedaf5b%3A0x98e42c9d1a0c68!2sMere%20laste%20suvelaager!5e0!3m2!1sen!2sus!4v1606061390008!5m2!1sen!2sus"
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d105828.13796563537!2d24.085855281270828!3d59.3199829032585!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4692a715d0c88d1b%3A0x8f548e57c27b6bb3!2sLaok%C3%BCla%20Merelaager!5e0!3m2!1sen!2sus!4v1751139557632!5m2!1sen!2sus"
           width="600"
           height="450"
-          frameBorder="0"
           style={{ border: 0 }}
           allowFullScreen={true}
-          aria-hidden="false"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
         ></iframe>
       </div>
     </section>
@@ -75,7 +75,7 @@ const checklistList: string[] = [
   "Sportlikud riided ja jalanõud",
   "Taskulamp ja varupatareid",
   "Päikesekaitsevahendid",
-  "Hea tuju!!!",
+  "Hea tuju!!!"
 ];
 
 const ChecklistSection = () => {
@@ -113,7 +113,7 @@ const activityList: string[] = [
   "19.30 – lõkkeõhtu, mängud, viktoriinid, võistlused, disko",
   "22.30 – rivistus, lipu langetamine (sõltuvalt päikeseloojangust)",
   "pesemine, valmistumine magama minekuks",
-  "23.00 – öörahu",
+  "23.00 – öörahu"
 ];
 
 const ScheduleSection = () => {
@@ -147,7 +147,7 @@ const rulesList: string[] = [
   "Kui laps loobub laagrikohast ja me ei leia asendusliiget, ei maksa me tagasi ei broneerimistasu ega laagritasu.",
   "Kui laps lahkub laagrist enne vahetuse lõppu laagrist mitteolenevatel põhjustel, me osalemistasu tagasi ei maksa, sest oleme lapse osalemisega arvestanud.",
   "Lapsi pildistatakse laagris ja pilte võidakse avaldada meedias, kodulehel ja sotsiaalmeedias. Juhul, kui te ei soovi, et merelaager lapsest pilte avaldaks, palun andke sellest juhatajale enne laagri algust kirjalikut teada.",
-  "Kui meil on alust kahtlustada, et lapse käes on keelatud aineid või esemeid, on kasvatajatel õigus lapse isiklikud asjad läbi vaadata.",
+  "Kui meil on alust kahtlustada, et lapse käes on keelatud aineid või esemeid, on kasvatajatel õigus lapse isiklikud asjad läbi vaadata."
 ];
 
 const RulesSection = () => {
