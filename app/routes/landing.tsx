@@ -1,6 +1,6 @@
 import type { LinksFunction, MetaDescriptor, MetaFunction } from "react-router";
 import { Link, useLoaderData } from "react-router";
-import React, { Fragment, useState, useRef, createRef, RefObject } from "react";
+import React, { createRef, Fragment, RefObject, useRef, useState } from "react";
 
 import Sponsors from "~/components/sponsors";
 import NavBar from "~/components/nav-bar";
@@ -8,13 +8,7 @@ import NavBar from "~/components/nav-bar";
 import MetaConstants from "~/utils/meta-constants";
 import { genMetaData } from "~/utils/metagen";
 
-import { landingPromoContent, QuickLink } from "~/hcdb";
-import {
-  LANDING_SUBTEXT,
-  LANDING_TAGLINE,
-  landingQuickLinks,
-  YEAR,
-} from "~/hcdb";
+import { LANDING_SUBTEXT, LANDING_TAGLINE, landingPromoContent, landingQuickLinks, QuickLink, YEAR } from "~/hcdb";
 import Footer from "~/components/footer";
 import { prisma } from "~/db.server";
 
@@ -25,8 +19,8 @@ export const meta: MetaFunction = () => {
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap",
-  },
+    href: "https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+  }
 ];
 
 const CTASection = () => {
@@ -129,9 +123,8 @@ const PromoSection = () => {
             vastava väljaõppe saanud kasvatajat.
           </p>
           <p className="u-mb-15">
-            {/*Laoküla merelaagrit korraldati {YEAR}. aasta suvel{" "}
-            {YEAR - 1998}. korda.*/}
-            Laoküla merelaagrit korraldati 2024. aasta suvel 26. korda.
+            Laoküla merelaagrit korraldatakse {YEAR}. aasta suvel{" "}
+            {YEAR - 1998}. korda.
           </p>
         </div>
         <div className="c-home-block-media">
@@ -151,10 +144,10 @@ const PromoSection = () => {
 
 export const loader = async () => {
   const dbTagline = await prisma.generalInfo.findUnique({
-    where: { key: "tagline" },
+    where: { key: "tagline" }
   });
   const dbSubtext = await prisma.generalInfo.findUnique({
-    where: { key: "subtext" },
+    where: { key: "subtext" }
   });
 
   const tagline = dbTagline ? dbTagline.value : LANDING_TAGLINE;
